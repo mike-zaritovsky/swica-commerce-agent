@@ -24,10 +24,10 @@ import type { Product } from "@/lib/types";
 import ProductTile from "../ProductTile";
 
 const STARTERS: Starter[] = [
-  { icon: "search", prompt: "Show me all available products" },
-  { icon: "tag", prompt: "Find me something under €50" },
-  { icon: "home", prompt: "I'm looking for a gift for a friend" },
-  { icon: "edit", prompt: "What are your most popular items?" },
+  { icon: "search", prompt: "Which insurance products do you offer?" },
+  { icon: "home", prompt: "I need cover for my family with two children" },
+  { icon: "tag", prompt: "How is my premium calculated?" },
+  { icon: "edit", prompt: "Compare supplementary hospital insurance options" },
 ];
 
 /** What the store is featuring: labelled bestseller or new, photographed ones first. */
@@ -39,9 +39,9 @@ function featured(catalog: Record<string, Product>): Product[] {
 }
 
 function Brief({ orders }: { orders: Order[] | null }) {
-  if (!orders) return <>Ask about a product, a project, an order, or a return.</>;
+  if (!orders) return <>Ask about insurance cover, what affects your premium, or which product fits you.</>;
   const open = upcoming(orders);
-  if (!open.length) return <>Nothing on the way right now. Ask about a product, a project, or a return.</>;
+  if (!open.length) return <>Prices shown are starting premiums; your personal premium depends on your age, package, and other details.</>;
   const late = open.filter((order) => order.status === "delayed");
   const next = estimateOf(open.find((order) => order.status !== "delayed") ?? open[0])?.date;
   return (
@@ -85,7 +85,7 @@ export default function HomeView({
       <Starters items={STARTERS} />
       <ArrivingPanel orders={orders} failed={ordersFailed} nouns={NOUNS} thumb={(order) => <OrderThumb order={order} />} onSeeAll={onSeeOrders} />
       {picks.length ? (
-        <HomeSection title="Popular right now" subtitle="Bestsellers and new arrivals; open one to ask about it">
+        <HomeSection title="Popular insurance products" subtitle="Starting premiums; open one to ask about it">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {picks.map((product) => (
               <ProductTile key={product.product_id} product={product} fluid onOpen={(item) => ask(`Tell me about the ${item.title}.`)} />

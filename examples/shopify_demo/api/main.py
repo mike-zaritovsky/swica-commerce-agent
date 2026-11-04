@@ -4,13 +4,18 @@ merchant portal (MerchantBackend over the same Shopify catalog) under /api/merch
     uvicorn shopify_demo.api.main:app --app-dir examples --reload --port 8000
     (cd examples/shopify_demo/merchant-web && npm run dev)   # :3100, once that app exists
 
-Set SHOPIFY_STORE_DOMAIN and SHOPIFY_STOREFRONT_TOKEN in .env before running.
+Set SHOPIFY_STORE_DOMAIN and SHOPIFY_STOREFRONT_TOKEN in .env before running. With
+FOUNDRY_SUBSCRIPTION_KEY set, model calls go through the dentsu gateway
+(``demo_common.gateway``); without it, through ANTHROPIC_API_KEY. The agent's wording lives
+in ``agent_profile.py``.
 """
 
 from __future__ import annotations
 
 import contextlib
 from pathlib import Path
+
+from fastapi import FastAPI
 
 from commerce_common.memory import InMemoryMemoryStore
 from demo_common import (
@@ -20,9 +25,11 @@ from demo_common import (
     build_storefront_host,
     load_demo_env,
 )
+from demo_common.gateway import build_gateway_client
 from shopping_agent import ShoppingAgentConfig
 from shopping_agent_runtime import ShoppingAgent
 
+from . import agent_profile as profile
 from .merchant import create_merchant_router
 from .shopify_backend import ShopifyBackend
 
@@ -34,15 +41,16 @@ load_demo_env(EXAMPLE_DIR)
 
 backend = ShopifyBackend()
 
+# The gateway client when FOUNDRY_SUBSCRIPTION_KEY is set, else None (default client).
+client = build_gateway_client()
+
 config = ShoppingAgentConfig(
-    brand_name="Develop Learning",
-    assistant_name="Shopping Assistant",
-    brand_voice=(
-        "Professional, warm, and helpful. "
-        "This is a general fashion and lifestyle store selling clothing, accessories, "
-        "and apparel for men and women. "
-        "All prices are in EUR."
-    ),
+    brand_name=profile.BRAND_NAME,
+    assistant_name=profile.ASSISTANT_NAME,
+    brand_voice=profile.BRAND_VOICE,
+    domain_search_notes=profile.DOMAIN_SEARCH_NOTES,
+    model=profile.MODEL,
+    memory_model=profile.MEMORY_MODEL,
 )
 
 agent = ShoppingAgent(
@@ -50,10 +58,11 @@ agent = ShoppingAgent(
     skills_dir=REPO_ROOT / "shopping-agent" / "skills",
     config=config,
     memory_store=InMemoryMemoryStore(),
+    client=client,
 )
 
 host = build_storefront_host(
-    title="Shopify Commerce Agent Demo",
+    title="SWICA Insurance Agent Demo",
     example_root=EXAMPLE_DIR,
     backend=backend,
     agent=agent,
@@ -79,7 +88,9 @@ async def _lifespan_with_catalog_warmup(app: FastAPI):
 
 app.router.lifespan_context = _lifespan_with_catalog_warmup
 
-app.include_router(create_merchant_router(backend, InMemoryMemoryStore()), prefix="/api/merchant")
+app.include_router(
+    create_merchant_router(backend, InMemoryMemoryStore(), client=client), prefix="/api/merchant"
+)
 
 
 @app.post("/api/cart/add")

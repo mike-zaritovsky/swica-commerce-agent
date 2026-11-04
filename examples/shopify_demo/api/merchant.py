@@ -25,11 +25,17 @@ the assistant says so instead of implying the storefront changed.
 from __future__ import annotations
 
 import asyncio
+import os
 import sqlite3
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from anthropic import AsyncAnthropic
+from fastapi import APIRouter
+
+from commerce_common.memory import MemoryStore
+from demo_common import REPO_ROOT, MerchantIdentity, build_merchant_router, host_approval_default
 from demo_common.merchant_fixtures import (
     alert_counts,
     apply_campaign_item,
@@ -46,13 +52,11 @@ from demo_common.merchant_fixtures import (
     refuse_outside_range,
     share_content,
     snapshot_of,
+)
+from demo_common.merchant_fixtures import (
     stage_campaign as _stage_campaign,
 )
 from demo_common.storefront_fixtures import load_json, refresh_family
-from fastapi import APIRouter
-
-from commerce_common.memory import MemoryStore
-from demo_common import REPO_ROOT, MerchantIdentity, build_merchant_router, host_approval_default
 from merchant_agent import (
     ActorKind,
     AnalysisTable,
@@ -96,6 +100,9 @@ def build_merchant_config(store_name: str) -> MerchantAgentConfig:
         require_host_approval=host_approval_default(),
         approval_surface="the Approve button on the change preview card",
         enable_analysis=True,
+        # The gateway serves claude-sonnet-5 and claude-haiku-4-5 only.
+        model=os.environ.get("AGENT_MODEL", "claude-sonnet-5"),
+        memory_model=os.environ.get("AGENT_MEMORY_MODEL", "claude-haiku-4-5"),
     )
 
 
@@ -754,8 +761,17 @@ class ShopifyMerchantBackend(MerchantBackend):
         ]
         daily_rows = [(r["date"], r["sales"], r["orders"], r["traffic"]) for r in self._daily]
         campaign_rows = [
-            (c.campaign_id, c.name, c.status, c.channel, c.budget, c.spend, c.revenue,
-             c.starts, c.ends)
+            (
+                c.campaign_id,
+                c.name,
+                c.status,
+                c.channel,
+                c.budget,
+                c.spend,
+                c.revenue,
+                c.starts,
+                c.ends,
+            )
             for c in self._campaigns.values()
         ]
         return listing_rows, daily_rows, campaign_rows
@@ -869,7 +885,11 @@ class ShopifyMerchantBackend(MerchantBackend):
         }
 
 
-def create_merchant_router(storefront: ShopifyBackend, memory_store: MemoryStore) -> APIRouter:
+def create_merchant_router(
+    storefront: ShopifyBackend,
+    memory_store: MemoryStore,
+    client: AsyncAnthropic | None = None,
+) -> APIRouter:
     config = build_merchant_config(storefront.store_name or "Develop Learning")
     merchant = ShopifyMerchantBackend(storefront, config, merchant_id=IDENTITY.merchant_id)
     agent = MerchantAgent(
@@ -877,6 +897,7 @@ def create_merchant_router(storefront: ShopifyBackend, memory_store: MemoryStore
         skills_dir=REPO_ROOT / "merchant-agent" / "skills",
         config=config,
         memory_store=memory_store,
+        client=client,
     )
     return build_merchant_router(
         storefront=storefront,

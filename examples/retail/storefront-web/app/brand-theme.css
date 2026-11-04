@@ -1,0 +1,43 @@
+/*
+ * Brand theme for embedding the storefront in an iframe on swica.ch. It overrides the
+ * design tokens in globals.css; every colour, the font, and the radius live here.
+ *
+ * PLACEHOLDER VALUES: swica.ch could not be read when this file was written, so the
+ * palette below is a calm insurer palette (white ground, deep blue text, one accent),
+ * not SWICA's official values. To match the site exactly, open swica.ch, inspect a
+ * heading, body text, a primary button and a link in DevTools, and copy their
+ * colour, font-family and border-radius into the tokens below.
+ */
+
+:root {
+  /* Font: put the site's font-family first (and load it in layout.tsx if it is a web font). */
+  --font-brand: var(--font-body), "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+
+  --ground: #ffffff; /* page: transparent-looking inside the host page */
+  --card: #ffffff;
+  --chrome: #ffffff;
+  --well: #f2f5f8; /* chips, thumbs, hover ground */
+  --ink: #0f2f4f; /* deep blue: text and structure */
+  --ink-2: #33475b;
+  --ink-soft: #5b6b7b;
+  --ink-faint: #9aa6b2;
+  --line: rgba(15, 47, 79, 0.12);
+  --line-strong: rgba(15, 47, 79, 0.2);
+  --accent: #00857c; /* primary actions, the assistant's mark, focus */
+  --accent-strong: #00736b;
+  --accent-soft: #e3f3f1;
+  --accent-ink: #00524c;
+  --on-accent: #ffffff;
+  --radius: 8px;
+  --shadow-sm: 0 1px 2px rgba(15, 47, 79, 0.06);
+  --shadow: 0 1px 2px rgba(15, 47, 79, 0.06), 0 4px 12px -6px rgba(15, 47, 79, 0.12);
+}
+
+body {
+  font-family: var(--font-brand);
+  background: var(--ground);
+}
+
+.btn-primary {
+  font-weight: 600;
+}

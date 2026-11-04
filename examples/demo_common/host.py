@@ -88,7 +88,11 @@ def spawn_background(coro: Coroutine[Any, Any, object]) -> None:
 def _lifespan(on_startup: Sequence[Callable[[], Awaitable[None]]]):
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-        if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")):
+        if not (
+            os.environ.get("ANTHROPIC_API_KEY")
+            or os.environ.get("ANTHROPIC_AUTH_TOKEN")
+            or os.environ.get("FOUNDRY_SUBSCRIPTION_KEY")
+        ):
             logger.info(
                 "No API key in the environment or .env files; the Anthropic SDK falls back "
                 "to its own credential chain. If chat returns auth errors, set "

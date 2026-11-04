@@ -3,6 +3,7 @@
 
 import type { CSSProperties } from "react";
 import { formatMoney } from "web-shared";
+import { fromPriceLabel } from "@/lib/price";
 import type { ComparisonPayload } from "@/lib/types";
 import { ProductImage, ProductTitle, Rating } from "../ProductTile";
 
@@ -63,7 +64,7 @@ export default function ComparisonGrid({
                     className="line-clamp-2 text-sm font-medium leading-snug"
                   />
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-semibold">{formatMoney(entry.product.price)}</span>
+                    <span className="font-semibold">{fromPriceLabel(entry.product)}</span>
                     <Rating rating={entry.product.rating} count={entry.product.review_count} />
                   </div>
                 </div>
@@ -97,7 +98,7 @@ export default function ComparisonGrid({
       </div>
       {delta ? (
         <p className="mt-3 text-[13px] text-(--ink)">
-          Price difference:{" "}
+          Difference in starting premium:{" "}
           <span className="font-semibold">{formatMoney(delta.amount)}</span>{" "}
           <span className="text-(--ink-soft)">
             ({formatMoney(delta.low_price)} vs {formatMoney(delta.high_price)})

@@ -4,10 +4,11 @@
 "use client";
 
 import { useState } from "react";
-import { hasOptions, optionSummary, optionValuesLabel, priceLabel, useStoreFrame } from "web-shared";
+import { hasOptions, optionSummary, optionValuesLabel, useStoreFrame } from "web-shared";
 import type { Product } from "@/lib/types";
 import { flyToCart } from "@/lib/flight";
 import { attributeChips, productGlyph, productTileClass } from "@/lib/format";
+import { fromPriceLabel } from "@/lib/price";
 import { STORE_POLICY } from "@/lib/storePolicy";
 
 /** A trailing parenthetical such as "(48-Pack)" is kept unbreakable so the clamp cuts before it. */
@@ -220,7 +221,7 @@ export default function ProductTile({
             </div>
           )}
           <div className="mt-auto flex items-center justify-between gap-1 pt-0.5">
-            <span className="text-sm font-semibold">{priceLabel(product)}</span>
+            <span className="text-sm font-semibold">{fromPriceLabel(product)}</span>
             <Rating rating={product.rating} count={compact ? undefined : product.review_count} />
           </div>
           <DeliveryPromise product={product} />
@@ -263,7 +264,7 @@ export function ProductRow({
         />
         <OptionLine product={product} />
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold">{priceLabel(product)}</span>
+          <span className="text-sm font-semibold">{fromPriceLabel(product)}</span>
           <Rating rating={product.rating} />
           {product.in_stock === false ? (
             <span className="rounded-full bg-(--ink)/85 px-2 py-0.5 text-[11px] font-medium text-(--surface)">

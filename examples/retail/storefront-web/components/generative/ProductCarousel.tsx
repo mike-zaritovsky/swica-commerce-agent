@@ -4,7 +4,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { formatMoney, optionValuesLabel, priceLabel, useStoreFrame } from "web-shared";
+import { optionValuesLabel, useStoreFrame } from "web-shared";
+import { fromPrice, fromPriceLabel } from "@/lib/price";
 import { fetchProduct } from "@/lib/api";
 import type { PriceIntelligence, Product, ProductDetails, ProductsPayload, ReviewAspects } from "@/lib/types";
 import ProductTile, { AddButton, DeliveryPromise, OptionLine, ProductImage, Rating } from "../ProductTile";
@@ -115,7 +116,7 @@ function VariantList({ family, variants }: { family: Product; variants: Product[
               className="rounded-full border border-(--line) bg-(--card) px-2.5 py-1 text-[12px] text-(--ink) transition-colors hover:border-(--ink) disabled:cursor-not-allowed disabled:text-(--ink-soft)/70 disabled:line-through"
             >
               {label}
-              {pricesDiffer ? <span className="text-(--ink-soft)"> · {formatMoney(variant.price, variant.currency)}</span> : null}
+              {pricesDiffer ? <span className="text-(--ink-soft)"> · {fromPrice(variant.price, variant.currency)}</span> : null}
             </button>
           </li>
         );
@@ -164,7 +165,7 @@ function ProductDetail({
               <div className="text-sm font-semibold leading-snug">{full.title}</div>
               <OptionLine product={full} />
               <div className="mt-0.5 flex items-center gap-2">
-                <span className="text-sm font-bold">{priceLabel(full)}</span>
+                <span className="text-sm font-bold">{fromPriceLabel(full)}</span>
                 <Rating rating={full.rating} count={full.review_count} />
                 {full.in_stock === false ? (
                   <span className="rounded-full bg-(--ink)/85 px-2 py-0.5 text-[11px] font-medium text-(--surface)">

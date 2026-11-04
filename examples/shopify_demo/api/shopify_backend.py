@@ -376,9 +376,7 @@ class ShopifyBackend(StorefrontBackend):
         for line in cart_data.get("lines", {}).get("nodes", []):
             merch = line.get("merchandise", {})
             product = merch.get("product", {})
-            option_values = {
-                o["name"]: o["value"] for o in merch.get("selectedOptions", [])
-            }
+            option_values = {o["name"]: o["value"] for o in merch.get("selectedOptions", [])}
             items.append(
                 CartItem(
                     product_id=self._parse_gid(merch.get("id", "")),
@@ -487,9 +485,7 @@ class ShopifyBackend(StorefrontBackend):
         line_id = self._find_line_id(raw, product_id)
         if not line_id:
             return self._map_cart(raw)
-        data = await self._gql(
-            self._CART_LINES_REMOVE, {"cartId": cart_id, "lineIds": [line_id]}
-        )
+        data = await self._gql(self._CART_LINES_REMOVE, {"cartId": cart_id, "lineIds": [line_id]})
         return self._map_cart(data.get("cartLinesRemove", {}).get("cart"))
 
     async def checkout_handoff(

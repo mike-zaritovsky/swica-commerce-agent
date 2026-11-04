@@ -74,7 +74,7 @@ export default function CartPanel({ cart, checkoutStaged = false }: { cart: Cart
         <>
           Nothing in the cart yet.
           <br />
-          Ask ACME Assistant for anything in the store.
+          Ask the SWICA Assistant about any insurance product.
         </>
       }
       footer={

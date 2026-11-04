@@ -14,15 +14,13 @@ import type { CartPayload } from "@/lib/types";
 
 type View = "assistant" | "orders";
 
-const ASSISTANT = "ACME Assistant";
+const ASSISTANT = "SWICA Assistant";
 
 function Wordmark() {
   return (
     <span className="flex items-center gap-2.5 pr-1">
-      <span aria-hidden className="grid h-[30px] w-[30px] place-items-center rounded-lg bg-(--ink) text-[15px] font-bold text-(--surface)">
-        A
-      </span>
-      <span className="text-[17px] font-bold tracking-[-0.02em] text-(--ink)">ACME</span>
+      <span className="text-[17px] font-bold tracking-[-0.01em] text-(--ink)">SWICA</span>
+      <span className="text-[13px] font-medium text-(--ink-soft)">Assistant</span>
     </span>
   );
 }
@@ -78,7 +76,7 @@ export default function StorefrontPage() {
       panel={<CartPanel cart={cart} checkoutStaged={checkoutStaged} />}
       panelOpen={panelOpen}
       onPanelOpenChange={setPanelOpen}
-      placeholder={view === "orders" ? "Ask about an order, a return, a delivery…" : "Ask about a product, a project, an order…"}
+      placeholder={view === "orders" ? "Ask about an order, a return, a delivery…" : "Ask about insurance cover, premiums, or your needs…"}
     >
       {/* The conversation stays mounted under the other view so its cards keep their state. */}
       <div className={view === "assistant" ? "h-full" : "hidden"}>
