@@ -3,15 +3,12 @@
 
 /** Image-less products get a tile color and glyph from id and category. */
 
+// SWICA tile grounds: gruen-200/-300, neutrals-200, blau-200 (from swica.ch's palette).
 const TILE_CLASSES = [
-  "bg-amber-100 text-amber-900",
-  "bg-emerald-100 text-emerald-900",
-  "bg-sky-100 text-sky-900",
-  "bg-rose-100 text-rose-900",
-  "bg-violet-100 text-violet-900",
-  "bg-lime-100 text-lime-900",
-  "bg-orange-100 text-orange-900",
-  "bg-cyan-100 text-cyan-900",
+  "bg-[#e5fff7] text-[#042d2e]",
+  "bg-[#d1fcf0] text-[#042d2e]",
+  "bg-[#f5f7f7] text-[#042d2e]",
+  "bg-[#e5f2fa] text-[#042d2e]",
 ];
 
 function hash(text: string): number {
@@ -47,6 +44,8 @@ const KEYWORD_GLYPHS: [string, string][] = [
 
 /** Rotated by product id so a same-category row varies. */
 const CATEGORY_GLYPHS: Record<string, string[]> = {
+  KVG: ["🩺"], // SWICA basic health insurance
+  VVG: ["🛡️"], // SWICA supplementary insurance
   "home-kitchen": ["🍳", "🫖", "🥘", "🔪"],
   "office-electronics": ["🖥️", "⌨️", "🎧", "🖱️"],
   "outdoor-camping": ["⛺", "🔦", "🥾", "🏕️"],
@@ -61,6 +60,8 @@ const CATEGORY_GLYPHS: Record<string, string[]> = {
 };
 
 export function productGlyph(product: { title?: string; category?: string | null; product_id?: string }): string {
+  // Insurance categories take their own glyph before any keyword in the title can match.
+  if (product.category === "KVG" || product.category === "VVG") return CATEGORY_GLYPHS[product.category][0];
   const title = (product.title ?? "").toLowerCase();
   for (const [keyword, glyph] of KEYWORD_GLYPHS) {
     if (title.includes(keyword)) return glyph;
@@ -85,5 +86,7 @@ export function attributeChips(product: { attributes?: Record<string, string> })
       return value;
     })
     .filter((chip): chip is string => Boolean(chip))
+    // A value can arrive twice (a Shopify product type repeated as a tag); show it once.
+    .filter((chip, index, chips) => chips.findIndex((other) => other.toLowerCase() === chip.toLowerCase()) === index)
     .slice(0, 3);
 }

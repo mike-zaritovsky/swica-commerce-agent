@@ -11,7 +11,7 @@
       "budget": 1200.0,
       "spend": 640.0,
       "revenue": 2380.0,
-      "currency": "EUR",
+      "currency": "CHF",
       "starts": "2026-09-11",
       "ends": "2026-10-09"
     },
@@ -24,7 +24,7 @@
       "budget": 600.0,
       "spend": 512.0,
       "revenue": 1490.0,
-      "currency": "EUR",
+      "currency": "CHF",
       "starts": "2026-09-03",
       "ends": "2026-09-21"
     },
@@ -37,7 +37,7 @@
       "budget": 250.0,
       "spend": 250.0,
       "revenue": null,
-      "currency": "EUR",
+      "currency": "CHF",
       "starts": "2026-08-19",
       "ends": "2026-08-21"
     },
@@ -50,7 +50,7 @@
       "budget": 400.0,
       "spend": 180.0,
       "revenue": 960.0,
-      "currency": "EUR",
+      "currency": "CHF",
       "starts": "2026-09-18",
       "ends": "2026-10-02"
     },
@@ -63,7 +63,7 @@
       "budget": 800.0,
       "spend": null,
       "revenue": null,
-      "currency": "EUR",
+      "currency": "CHF",
       "starts": "2026-09-30",
       "ends": "2026-10-21"
     }

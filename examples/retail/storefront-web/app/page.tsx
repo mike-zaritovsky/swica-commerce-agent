@@ -9,6 +9,7 @@ import CartPanel from "@/components/CartPanel";
 import Chat from "@/components/Chat";
 import HomeView from "@/components/views/HomeView";
 import { api, UNREACHABLE } from "@/lib/api";
+import "@/lib/price"; // sets the storefront's default currency
 import { NOUNS, OrderThumb } from "@/lib/orders";
 import type { CartPayload } from "@/lib/types";
 
@@ -19,7 +20,7 @@ const ASSISTANT = "SWICA Assistant";
 function Wordmark() {
   return (
     <span className="flex items-center gap-2.5 pr-1">
-      <span className="text-[17px] font-bold tracking-[-0.01em] text-(--ink)">SWICA</span>
+      <span className="text-[22px] font-medium tracking-[0.02em] text-(--accent)">SWICA</span>
       <span className="text-[13px] font-medium text-(--ink-soft)">Assistant</span>
     </span>
   );

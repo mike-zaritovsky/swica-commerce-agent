@@ -2,12 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const moneyFormatters = new Map<string, Intl.NumberFormat>();
+let defaultCurrency = "USD";
+
+/** The currency `formatMoney` uses when a call names none; a storefront sets it once. */
+export function setDefaultCurrency(currency: string): void {
+  defaultCurrency = currency;
+}
 
 export function formatMoney(
   value: number,
-  currency = "USD",
+  currency?: string | null,
   options: { whole?: boolean } = {},
 ): string {
+  currency = currency || defaultCurrency;
   const key = `${currency}:${options.whole ? 0 : 2}`;
   let formatter = moneyFormatters.get(key);
   if (!formatter) {

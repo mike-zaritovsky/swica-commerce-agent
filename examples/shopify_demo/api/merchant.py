@@ -121,7 +121,7 @@ class ShopifyMerchantBackend(MerchantBackend):
 
         metrics = load_json(data_dir, "merchant_metrics.json")
         self._daily = rebase_daily(metrics["daily"])
-        self._currency: str = metrics.get("currency", "EUR")
+        self._currency: str = metrics.get("currency", "CHF")
 
         inventory = load_json(data_dir, "merchant_inventory.json")
         self._default_stock: int = inventory.get("default_stock", 40)

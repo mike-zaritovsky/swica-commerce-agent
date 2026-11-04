@@ -2,7 +2,10 @@
 commerce-agents StorefrontBackend interface.
 
 Requires: httpx (pip install httpx)
-Env vars: SHOPIFY_STORE_DOMAIN, SHOPIFY_STOREFRONT_TOKEN
+Env vars: SHOPIFY_STORE_DOMAIN, SHOPIFY_STOREFRONT_TOKEN; optional SHOPIFY_COUNTRY (the
+buyer country every query runs in, which sets the prices' currency; default CH),
+SHOPIFY_CURRENCY (the currency assumed when a response names none; default CHF), and
+SHOPIFY_VENDOR (only products from this vendor are listed; default SWICA, empty lists all).
 """
 
 from __future__ import annotations
@@ -29,6 +32,9 @@ from shopping_agent import (
     UserPreferences,
 )
 
+# Replaced in every query with SHOPIFY_COUNTRY (see ``ShopifyBackend._gql``).
+COUNTRY_TOKEN = "__COUNTRY__"
+
 
 class ShopifyBackend(StorefrontBackend):
     """A StorefrontBackend that talks to a real Shopify store via the Storefront API."""
@@ -46,6 +52,17 @@ class ShopifyBackend(StorefrontBackend):
         self.products: dict[str, ProductDetails] = {}
         self.variants: dict[str, ProductDetails] = {}
         self.store_name: str = store_domain or "the store"
+        country = os.environ.get("SHOPIFY_COUNTRY", "CH").strip().upper()
+        if not re.fullmatch(r"[A-Z]{2}", country):
+            raise ValueError(f"SHOPIFY_COUNTRY must be a two-letter country code, not {country!r}")
+        self._country = country
+        self._default_currency = os.environ.get("SHOPIFY_CURRENCY", "CHF").strip().upper()
+        self._vendor = os.environ.get("SHOPIFY_VENDOR", "SWICA").strip().lower()
+
+    def _is_listed(self, node: dict) -> bool:
+        """Whether a product belongs to the catalog this agent sells: the configured
+        vendor's products only, so other items in the same store never surface."""
+        return not self._vendor or (node.get("vendor") or "").strip().lower() == self._vendor
 
     # ------------------------------------------------------------------
     # GraphQL helper
@@ -54,7 +71,10 @@ class ShopifyBackend(StorefrontBackend):
     async def _gql(self, query: str, variables: dict[str, Any] | None = None) -> dict:
         resp = await self._client.post(
             self._api_url,
-            json={"query": query, "variables": variables or {}},
+            json={
+                "query": query.replace(COUNTRY_TOKEN, self._country),
+                "variables": variables or {},
+            },
             headers={
                 "X-Shopify-Storefront-Access-Token": self._token,
                 "Content-Type": "application/json",
@@ -80,11 +100,10 @@ class ShopifyBackend(StorefrontBackend):
             return 0.0
         return float(price_obj.get("amount", 0))
 
-    @staticmethod
-    def _currency(price_obj: dict | None) -> str:
+    def _currency(self, price_obj: dict | None) -> str:
         if not price_obj:
-            return "EUR"
-        return price_obj.get("currencyCode", "EUR")
+            return self._default_currency
+        return price_obj.get("currencyCode", self._default_currency)
 
     def _map_product_summary(self, node: dict) -> Product:
         price_range = node.get("priceRange", {})
@@ -181,11 +200,11 @@ class ShopifyBackend(StorefrontBackend):
         return details
 
     # ------------------------------------------------------------------
-    # Catalog — @inContext(country: PT) forces EUR pricing everywhere
+    # Catalog — every query runs in SHOPIFY_COUNTRY, which sets the prices' currency
     # ------------------------------------------------------------------
 
     _SEARCH_QUERY = """
-    query SearchProducts($query: String!, $first: Int!) @inContext(country: PT) {
+    query SearchProducts($query: String!, $first: Int!) @inContext(country: __COUNTRY__) {
       search(query: $query, first: $first, types: PRODUCT) {
         nodes {
           ... on Product {
@@ -232,7 +251,7 @@ class ShopifyBackend(StorefrontBackend):
 
         products: list[Product] = []
         for n in nodes:
-            if not n.get("id"):
+            if not n.get("id") or not self._is_listed(n):
                 continue
             details = self._map_product_details(n)
             products.append(
@@ -263,7 +282,7 @@ class ShopifyBackend(StorefrontBackend):
         return products[:limit]
 
     _PRODUCT_QUERY = """
-    query GetProduct($id: ID!) @inContext(country: PT) {
+    query GetProduct($id: ID!) @inContext(country: __COUNTRY__) {
       product(id: $id) {
         id
         title
@@ -305,12 +324,12 @@ class ShopifyBackend(StorefrontBackend):
         gid = f"gid://shopify/Product/{product_id}"
         data = await self._gql(self._PRODUCT_QUERY, {"id": gid})
         node = data.get("product")
-        if not node:
+        if not node or not self._is_listed(node):
             return None
         return self._map_product_details(node)
 
     # ------------------------------------------------------------------
-    # Cart — all mutations use @inContext(country: PT) for EUR
+    # Cart — mutations run in SHOPIFY_COUNTRY too, so the cart's currency matches
     # ------------------------------------------------------------------
 
     _CART_FIELDS = """
@@ -328,7 +347,7 @@ class ShopifyBackend(StorefrontBackend):
     """
 
     _CART_CREATE = f"""
-    mutation CartCreate($lines: [CartLineInput!]!) @inContext(country: PT) {{
+    mutation CartCreate($lines: [CartLineInput!]!) @inContext(country: __COUNTRY__) {{
       cartCreate(input: {{ lines: $lines }}) {{
         cart {{ {_CART_FIELDS} }}
         userErrors {{ field message }}
@@ -337,7 +356,7 @@ class ShopifyBackend(StorefrontBackend):
     """
 
     _CART_LINES_ADD = f"""
-    mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) @inContext(country: PT) {{
+    mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) @inContext(country: __COUNTRY__) {{
       cartLinesAdd(cartId: $cartId, lines: $lines) {{
         cart {{ {_CART_FIELDS} }}
         userErrors {{ field message }}
@@ -346,7 +365,7 @@ class ShopifyBackend(StorefrontBackend):
     """
 
     _CART_LINES_UPDATE = f"""
-    mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) @inContext(country: PT) {{
+    mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) @inContext(country: __COUNTRY__) {{
       cartLinesUpdate(cartId: $cartId, lines: $lines) {{
         cart {{ {_CART_FIELDS} }}
         userErrors {{ field message }}
@@ -355,7 +374,7 @@ class ShopifyBackend(StorefrontBackend):
     """
 
     _CART_LINES_REMOVE = f"""
-    mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) @inContext(country: PT) {{
+    mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) @inContext(country: __COUNTRY__) {{
       cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {{
         cart {{ {_CART_FIELDS} }}
         userErrors {{ field message }}
@@ -364,7 +383,7 @@ class ShopifyBackend(StorefrontBackend):
     """
 
     _CART_QUERY = f"""
-    query GetCart($id: ID!) @inContext(country: PT) {{
+    query GetCart($id: ID!) @inContext(country: __COUNTRY__) {{
       cart(id: $id) {{ {_CART_FIELDS} }}
     }}
     """
@@ -388,11 +407,11 @@ class ShopifyBackend(StorefrontBackend):
                     variant_of=self._parse_gid(product.get("id", "")),
                 )
             )
-        currency = "EUR"
+        currency = self._default_currency
         cost = cart_data.get("cost", {})
         subtotal = cost.get("subtotalAmount", {})
         if subtotal:
-            currency = subtotal.get("currencyCode", "EUR")
+            currency = subtotal.get("currencyCode", self._default_currency)
         return Cart(items=items, currency=currency)
 
     def _find_line_id(self, cart_data: dict, variant_id: str) -> str | None:
@@ -424,7 +443,7 @@ class ShopifyBackend(StorefrontBackend):
                     return f"gid://shopify/ProductVariant/{v.product_id}"
         gid = f"gid://shopify/Product/{product_id}"
         data = await self._gql(
-            """query ($id: ID!) @inContext(country: PT) { product(id: $id) {
+            """query ($id: ID!) @inContext(country: __COUNTRY__) { product(id: $id) {
                 variants(first: 1) { nodes { id availableForSale } }
             }}""",
             {"id": gid},
@@ -525,7 +544,7 @@ class ShopifyBackend(StorefrontBackend):
                 policy_id="shipping",
                 title="Shipping Policy",
                 category="shipping",
-                content="Standard shipping 3-5 business days. Free shipping on orders over €49.",
+                content="Standard shipping 3-5 business days. Free shipping on orders over CHF 49.",
             ),
             Policy(
                 policy_id="returns",
@@ -555,7 +574,7 @@ class ShopifyBackend(StorefrontBackend):
     # ------------------------------------------------------------------
 
     _CATALOG_PAGE_QUERY = """
-    query CatalogPage($first: Int!, $after: String) @inContext(country: PT) {
+    query CatalogPage($first: Int!, $after: String) @inContext(country: __COUNTRY__) {
       products(first: $first, after: $after) {
         pageInfo { hasNextPage endCursor }
         nodes {
@@ -605,7 +624,7 @@ class ShopifyBackend(StorefrontBackend):
             )
             page = data.get("products", {})
             for node in page.get("nodes", []):
-                if not node.get("id"):
+                if not node.get("id") or not self._is_listed(node):
                     continue
                 collected.append(self._map_product_details(node))
             page_info = page.get("pageInfo", {})

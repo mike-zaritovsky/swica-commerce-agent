@@ -2,7 +2,10 @@
 // starting premium, and the actual premium is calculated from the customer's details
 // (age, package, deductible, residence). So every price reads as a "from" price.
 
-import { formatMoney } from "web-shared";
+import { formatMoney, setDefaultCurrency } from "web-shared";
+
+// Every amount in this storefront is in Swiss francs unless a record names its currency.
+setDefaultCurrency("CHF");
 
 export const FROM_PREFIX = "from";
 

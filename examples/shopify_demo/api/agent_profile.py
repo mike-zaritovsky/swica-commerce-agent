@@ -31,9 +31,11 @@ BRAND_VOICE = (
 )
 
 DOMAIN_SEARCH_NOTES = (
-    "The catalog lists insurance products (for example basic and supplementary health "
-    "cover). Search by need (hospital, dental, alternative medicine, travel, family) as well "
-    "as by product name, and treat each listed price as a 'from' premium."
+    "The catalog lists insurance products in two categories: KVG is the compulsory basic "
+    "health insurance (its models differ in how care is accessed, such as a family doctor, "
+    "telemedicine, or free choice), and VVG is supplementary insurance (hospital, dental, "
+    "travel, accident, and similar cover). Search by need as well as by product name, and "
+    "treat each listed price as a 'from' premium."
 )
 
 # Model names as the dentsu gateway knows them (no date suffix). Overridable per run.

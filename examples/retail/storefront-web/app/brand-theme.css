@@ -1,43 +1,96 @@
 /*
- * Brand theme for embedding the storefront in an iframe on swica.ch. It overrides the
- * design tokens in globals.css; every colour, the font, and the radius live here.
+ * SWICA theme for embedding the storefront in an iframe on swica.ch. It overrides the
+ * design tokens in globals.css; colours, radii and type sizes are taken from the
+ * design-system custom properties in swica.ch's stylesheet (names in the comments).
  *
- * PLACEHOLDER VALUES: swica.ch could not be read when this file was written, so the
- * palette below is a calm insurer palette (white ground, deep blue text, one accent),
- * not SWICA's official values. To match the site exactly, open swica.ch, inspect a
- * heading, body text, a primary button and a link in DevTools, and copy their
- * colour, font-family and border-radius into the tokens below.
+ * Font: swica.ch uses its own licensed "SWICA" typeface, which is not copied here. The
+ * stack names it first (it applies wherever the browser has it) and falls back to
+ * Outfit, the closest open geometric sans, loaded in layout.tsx.
  */
 
 :root {
-  /* Font: put the site's font-family first (and load it in layout.tsx if it is a web font). */
-  --font-brand: var(--font-body), "Helvetica Neue", Arial, ui-sans-serif, system-ui, sans-serif;
+  --font-brand: "SWICA", var(--font-body), "Avenir Next", "Helvetica Neue", Arial, sans-serif;
 
-  --ground: #ffffff; /* page: transparent-looking inside the host page */
+  /* Ground and surfaces: core-color-wl-neutrals-000 / -200 / -300 */
+  --ground: #ffffff;
+  --surface: #ffffff;
   --card: #ffffff;
   --chrome: #ffffff;
-  --well: #f2f5f8; /* chips, thumbs, hover ground */
-  --ink: #0f2f4f; /* deep blue: text and structure */
-  --ink-2: #33475b;
-  --ink-soft: #5b6b7b;
-  --ink-faint: #9aa6b2;
-  --line: rgba(15, 47, 79, 0.12);
-  --line-strong: rgba(15, 47, 79, 0.2);
-  --accent: #00857c; /* primary actions, the assistant's mark, focus */
-  --accent-strong: #00736b;
-  --accent-soft: #e3f3f1;
-  --accent-ink: #00524c;
+  --well: #f5f7f7; /* form-textfield-default-bg, background-section-neutral */
+
+  /* Ink: neutrals-1100 (text), -900, -800, -600 */
+  --ink: #042d2e;
+  --ink-2: #254849;
+  --ink-soft: #456464;
+  --ink-faint: #a0afb0;
+  --line: #e1e6e6; /* neutrals-400, accordion border */
+  --line-strong: #bec8c9; /* neutrals-500 */
+
+  /* Accent: gruen-700 primary button, gruen-800 hover, gruen-200 mint section, gruen-600 */
+  --accent: #01bba8;
+  --accent-strong: #00857c;
+  --accent-soft: #e5fff7;
+  --accent-ink: #06494a;
   --on-accent: #ffffff;
-  --radius: 8px;
-  --shadow-sm: 0 1px 2px rgba(15, 47, 79, 0.06);
-  --shadow: 0 1px 2px rgba(15, 47, 79, 0.06), 0 4px 12px -6px rgba(15, 47, 79, 0.12);
+
+  /* Status: notification and brand palettes */
+  --ok: #00857c;
+  --ok-soft: #e5fff7;
+  --warn: #8a8479; /* gelb-700 */
+  --warn-soft: #fcfadb; /* gelb-200 */
+  --danger: #b81b09; /* notification-alert-700 */
+  --danger-soft: #ffedeb;
+  --info: #145ba3; /* notification-info-700 */
+  --info-soft: #edfaff;
+  --violet: #6b4fd6;
+  --violet-soft: #ede5fc; /* badgetag-default-bg */
+  --star: #01bba8;
+
+  /* Shape: button-vpm-border-radius 16px, card-vps-border-radius 16px */
+  --radius: 16px;
+  --shadow-sm: 0 1px 2px rgba(4, 45, 46, 0.06);
+  --shadow: 0 1px 2px rgba(4, 45, 46, 0.05), 0 6px 16px -8px rgba(4, 45, 46, 0.14);
+  --shadow-lg: 0 12px 36px -12px rgba(4, 45, 46, 0.24), 0 2px 6px rgba(4, 45, 46, 0.06);
 }
 
+/* semantic-typography-body-vpm-md: 16px / 24px, weight 400 */
 body {
   font-family: var(--font-brand);
+  font-size: 16px;
+  line-height: 24px;
   background: var(--ground);
+  color: var(--ink);
 }
 
+/* Buttons: button-vpm font-size 16px, weight 700; hover darkens to gruen-800. */
 .btn-primary {
-  font-weight: 600;
+  background: var(--accent-strong);
+  font-weight: 700;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #06494a;
+  filter: none;
+}
+.btn-primary:disabled {
+  background: #eff1f1; /* button-primary-disabled-bg */
+  color: #637d7d;
+}
+
+/* Chips as the site's filter badges: badgefilter radius 40px, mint ground, bold. */
+.chip {
+  border-color: transparent;
+  background: #d1fcf0; /* badgefilter-default-bg */
+  color: var(--ink);
+  font-weight: 700;
+}
+.chip:hover:not(:disabled) {
+  border-color: transparent;
+  background: #c0faea; /* badgefilter-hover-bg */
+  color: var(--ink);
+}
+
+/* The customer's own messages in the brand's dark green. */
+.user-bubble {
+  background: var(--accent-strong);
+  color: var(--on-accent);
 }

@@ -25,6 +25,10 @@ request with a tool, and two cached requests, per key:
 python scripts/gateway_smoke.py
 ```
 
+The backend lists only the `SHOPIFY_VENDOR` products (default `SWICA`; the store's other
+items never surface) and runs every Shopify query in `SHOPIFY_COUNTRY` (default `CH`), so
+prices come back in Swiss francs.
+
 With `FOUNDRY_SUBSCRIPTION_KEY` set, model calls go through the gateway
 (`examples/demo_common/gateway.py`); without it, through `ANTHROPIC_API_KEY`. Models default
 to `claude-sonnet-5` and `claude-haiku-4-5` (`AGENT_MODEL`, `AGENT_MEMORY_MODEL`).
@@ -52,6 +56,7 @@ runtime logger; from the second turn the cached figure should be above zero.
 - `api/agent_profile.py`: the agent's name, voice, and insurance rules ("from" premiums,
   personal premium calculated separately).
 - `api/shopify_backend.py`: `StorefrontBackend` over the Shopify Storefront API.
-- `examples/retail/storefront-web/app/brand-theme.css`: colours, font, radius.
-- `examples/retail/storefront-web/lib/price.ts`: the "from" price label.
+- `examples/retail/storefront-web/app/brand-theme.css`: colours, radii, and type taken from
+  swica.ch's design tokens; Outfit stands in for the licensed SWICA typeface.
+- `examples/retail/storefront-web/lib/price.ts`: the "from" price label and the CHF default.
 - `examples/retail/storefront-web/components/views/HomeView.tsx`: the start prompts.

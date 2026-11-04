@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Metadata } from "next";
-import { Source_Sans_3 } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import "./brand-theme.css";
 
-const brandFont = Source_Sans_3({
+const brandFont = Outfit({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={brandFont.variable}>
+    <html lang="de" className={brandFont.variable}>
       <body>{children}</body>
     </html>
   );
