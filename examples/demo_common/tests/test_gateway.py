@@ -9,7 +9,12 @@ import httpx
 import pytest
 from anthropic import AsyncAnthropic
 
-from demo_common.gateway import GatewayTransport, build_gateway_client
+from demo_common.gateway import (
+    GatewayCredential,
+    GatewayTransport,
+    build_gateway_client,
+    credentials_from_env,
+)
 
 MESSAGE = {
     "id": "msg_1",
@@ -68,7 +73,10 @@ class Recorder:
 
 
 def _client(recorder: Recorder, fallback: str | None = "k2") -> AsyncAnthropic:
-    transport = GatewayTransport("k1", fallback, inner=httpx.MockTransport(recorder))
+    credentials = [GatewayCredential("k1", "proj_v2", "primary")]
+    if fallback:
+        credentials.append(GatewayCredential(fallback, "proj_v3", "fallback"))
+    transport = GatewayTransport(credentials, inner=httpx.MockTransport(recorder))
     return AsyncAnthropic(
         base_url="https://gw.example/foundry",
         api_key="k1",
@@ -91,6 +99,7 @@ async def test_rewrites_path_and_sets_key() -> None:
     assert request.url.path == "/foundry/chat/completions"
     assert request.url.params["api-version"] == "2024-05-01-preview"
     assert request.headers["Ocp-Apim-Subscription-Key"] == "k1"
+    assert request.headers["x-project"] == "proj_v2"
     assert json.loads(request.content)["messages"][0]["content"] == "Hello"
 
 
@@ -99,6 +108,7 @@ async def test_falls_back_to_second_key_and_stays_on_it() -> None:
     client = _client(recorder)
     assert await _ask(client) == "Hi"
     assert [r.headers["Ocp-Apim-Subscription-Key"] for r in recorder.requests] == ["k1", "k2"]
+    assert [r.headers["x-project"] for r in recorder.requests] == ["proj_v2", "proj_v3"]
     assert recorder.requests[0].content == recorder.requests[1].content
     await _ask(client)  # within the cooldown the fallback key goes first
     assert recorder.requests[2].headers["Ocp-Apim-Subscription-Key"] == "k2"
@@ -128,3 +138,14 @@ def test_client_only_when_key_is_set(monkeypatch: pytest.MonkeyPatch) -> None:
     client = build_gateway_client()
     assert client is not None
     assert str(client.base_url).startswith("https://ai-api-dev.dentsu.com/foundry")
+
+
+def test_each_key_pairs_with_its_project(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("FOUNDRY_SUBSCRIPTION_KEY", "k1")
+    monkeypatch.setenv("FOUNDRY_PROJECT", "proj_v2")
+    monkeypatch.setenv("FOUNDRY_SUBSCRIPTION_KEY_FALLBACK", "k2")
+    monkeypatch.setenv("FOUNDRY_PROJECT_FALLBACK", "proj_v3")
+    pairs = [(c.key, c.project) for c in credentials_from_env()]
+    assert pairs == [("k1", "proj_v2"), ("k2", "proj_v3")]
+    monkeypatch.delenv("FOUNDRY_PROJECT_FALLBACK")
+    assert credentials_from_env()[1].project == "proj_v2"

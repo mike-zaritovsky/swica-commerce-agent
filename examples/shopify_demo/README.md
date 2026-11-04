@@ -13,7 +13,16 @@ Create `.env` at the repo root (never committed; `.env.example` lists every vari
 SHOPIFY_STORE_DOMAIN=...
 SHOPIFY_STOREFRONT_TOKEN=...
 FOUNDRY_SUBSCRIPTION_KEY=...           # dentsu AI gateway, primary key
+FOUNDRY_PROJECT=...                    # the gateway project that key belongs to
 FOUNDRY_SUBSCRIPTION_KEY_FALLBACK=...  # used when the primary is refused (401/403/429)
+FOUNDRY_PROJECT_FALLBACK=...           # the fallback key's project
+```
+
+Check the keys before the first run; it sends a plain request on both models, a streamed
+request with a tool, and two cached requests, per key:
+
+```bash
+python scripts/gateway_smoke.py
 ```
 
 With `FOUNDRY_SUBSCRIPTION_KEY` set, model calls go through the gateway
