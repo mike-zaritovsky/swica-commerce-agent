@@ -1,0 +1,68 @@
+{
+  "source_note": "Facts copied from www.swica.ch (English pages, read November 2026); each entry names its page in `source`. Recheck them before a real deployment.",
+  "policies": [
+    {
+      "policy_id": "contact",
+      "title": "Contact SWICA: phone, consultation, contact form (Kontakt, Beratung, Telefon)",
+      "category": "contact",
+      "content": "Customer service and insurance advice: +41 58 800 99 33. The customer service line is answered 24 hours a day, including weekends; insurance advice by phone is available Monday to Friday until 21:00, also as a video consultation on request. A personal insurance consultation (about 45 minutes, by phone, by video call, or at a SWICA branch) can be booked at https://www.swica.ch/en/private/insurance/contact/advice; SWICA confirms the appointment within 24 hours during business hours. Written questions go through the contact form at https://www.swica.ch/en/private/insurance/contact/form. Medical questions (not insurance): santé24, SWICA's medical advice service, +41 44 404 86 86, 24 hours a day, 365 days a year. A personal premium quote: the premium calculator at https://www.swica.ch/en/private/services/premium-calculator.",
+      "source": "https://www.swica.ch/en/private/insurance/contact"
+    },
+    {
+      "policy_id": "excess",
+      "title": "Annual excess in basic insurance (Franchise, Selbstbehalt, deductible)",
+      "category": "excess franchise selbstbehalt premium discount",
+      "content": "Basic insurance (KVG) has an annual excess between CHF 300 (minimum) and CHF 2500 (maximum); children are exempt from the excess. On top of the excess there is a deductible (Selbstbehalt) of 10% (20% for certain medications) on benefits above the excess, capped at CHF 700 per calendar year for adults and CHF 350 for insured persons under 19. A higher excess lowers the premium: the maximum premium reduction per year is CHF 140 at CHF 500 excess, CHF 490 at CHF 1000, CHF 840 at CHF 1500, CHF 1190 at CHF 2000, and CHF 1540 at CHF 2500 (maximum annual co-payment CHF 1200, 1700, 2200, 2700, and 3200 respectively; CHF 1000 at CHF 300 excess). A new excess takes effect at the start of a calendar year: a reduction must reach SWICA by 17:00 on the last working day in November, an increase by 17:00 on the last working day in December. Cross-border commuter insurance (KVG) has a fixed CHF 300 excess.",
+      "source": "https://www.swica.ch/en/private/services/optimise-save/basic-insurance"
+    },
+    {
+      "policy_id": "accident-cover",
+      "title": "Including or excluding accident cover (Unfalldeckung ein- oder ausschliessen)",
+      "category": "accident unfall premium",
+      "content": "Anyone employed at least eight hours a week by the same employer is insured for occupational and non-occupational accidents through the employer under the Federal Act on Accident Insurance (UVG). They can exclude accident cover from their basic health insurance and save 7% on the basic insurance premium. Everyone else must include accident cover in their health insurance. The change can be notified online.",
+      "source": "https://www.swica.ch/en/private/services/change/include-exclude-accident"
+    },
+    {
+      "policy_id": "family-discounts",
+      "title": "Discounts for children, young adults, and annual payment (Familienrabatt, Kinder, Rabatt)",
+      "category": "discount rabatt family familie children kinder premium",
+      "content": "Basic insurance family discounts: children get a 75% discount on the adult basic insurance premium for the first and second child, and 89% from the third child on. Young adults aged 19 to 25 get a 25% discount on the adult basic insurance premium. Paying premiums annually gives a 0.5% discount on all basic and supplementary insurance with SWICA; the payment frequency is changed in the mySWICA portal or by phone on +41 58 800 99 33. Babies can be insured from birth; registration is online, in mySWICA, or by phone.",
+      "source": "https://www.swica.ch/en/private/services/optimise-save/basic-insurance"
+    },
+    {
+      "policy_id": "basic-models",
+      "title": "Basic insurance models and their premium discounts (Grundversicherung Modelle, Favorit)",
+      "category": "kvg basic grundversicherung model modell discount",
+      "content": "Compared with the Standard model (free choice of doctor), the alternative Favorit models give these maximum premium discounts, depending on place of residence, age, and excess: Favorit Casa (general practitioner model) up to 16%, Favorit Medica (doctor list) up to 11%, Favorit Medpharm (pharmacy model) up to 23%, Favorit Bestcare up to 17%, Favorit Multichoice up to 23%, Favorit Santé (SWICA partner practices first) up to 22%, Favorit Telmed (telemedicine first) up to 17%, Favorit Start up to 23%. The discount that applies to a customer is shown in the premium calculator.",
+      "source": "https://www.swica.ch/en/private/insurance/basic-insurance/overview"
+    },
+    {
+      "policy_id": "combination-discounts",
+      "title": "Combining basic and supplementary insurance (Kombination, Spitalversicherung Rabatt)",
+      "category": "discount rabatt combination hospital spital vvg",
+      "content": "With the Favorit Santé basic insurance model, hospitalisation insurance premiums get a 15% discount. With a Santé discount, the Benevita discount adds up to 15% on semi-private and private hospitalisation insurance, for a total of up to 30%; the Santé discount and a group discount cannot be combined (the higher one applies). A group contract discount combines with the Benevita discount on semi-private and private hospitalisation insurance (up to 30% in total) and on Completa Top and Completa Forte (up to 10%: 5% Benevita plus 5% group). SWICA offsets the co-payment for basic insurance against the co-payment for supplementary insurance, which lowers the maximum annual co-payment. Hospitalisation insurance premiums are based on the age at enrolment rather than rising every five years.",
+      "source": "https://www.swica.ch/en/private/services/optimise-save/combination-advantage"
+    },
+    {
+      "policy_id": "switching",
+      "title": "Switching to SWICA and cancelling the previous basic insurance (Wechsel, Kündigung)",
+      "category": "switch wechsel cancel kündigung kuendigung deadline frist",
+      "content": "To switch basic insurance to SWICA, the existing basic insurance is cancelled with the previous insurer by the notice deadline of 30 November. The completed termination form for the previous policy is sent to SWICA in good time; SWICA forwards it to the previous insurer only once the customer is unconditionally insured with SWICA as requested. A quote, and basic and supplementary insurance, can be taken out online through the premium calculator.",
+      "source": "https://www.swica.ch/en/private/services/optimise-save/basic-insurance"
+    },
+    {
+      "policy_id": "paying-premiums",
+      "title": "Paying premiums: eBill, direct debit, QR invoice (Prämien bezahlen)",
+      "category": "payment zahlung invoice rechnung premium",
+      "content": "Premium invoices can be paid by eBill in e-banking, by direct debit (LSV or PostFinance Direct Debit), or by QR invoice. Paying at a post office counter incurs a Swiss Post handling fee that SWICA passes on for basic insurance (KVG) payments: CHF 1.20 up to CHF 50, CHF 1.60 up to CHF 100, CHF 2.35 up to CHF 1000, CHF 3.95 up to CHF 10 000, and CHF 1.20 for each further CHF 10 000; no fee applies to supplementary insurance (VVG) payments. Paying annually gives a 0.5% discount.",
+      "source": "https://www.swica.ch/en/private/services/change/paying-premiums"
+    },
+    {
+      "policy_id": "premium-relief",
+      "title": "Premium exemption for military service and cantonal premium reductions (Prämienverbilligung)",
+      "category": "premium reduction verbilligung military militär",
+      "content": "During military or civilian service of more than 60 consecutive days, the basic insurance premium is fully suspended for that period, or refunded when the confirmation is submitted afterwards. People on a limited income can get a cantonal premium reduction for basic insurance; each canton handles it differently, through the information office of the canton of residence.",
+      "source": "https://www.swica.ch/en/private/services/optimise-save/basic-insurance"
+    }
+  ]
+}

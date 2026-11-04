@@ -1,6 +1,8 @@
 // Copyright 2026 Anthropic PBC
 // SPDX-License-Identifier: Apache-2.0
 
+import { tr } from "./i18n";
+
 const moneyFormatters = new Map<string, Intl.NumberFormat>();
 let defaultCurrency = "USD";
 
@@ -233,9 +235,9 @@ export function describeResolver(change: {
 /** "Good morning" before noon, "Good afternoon" until six, then "Good evening". */
 export function greeting(now: Date): string {
   const hour = now.getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+  if (hour < 12) return tr("Good morning");
+  if (hour < 18) return tr("Good afternoon");
+  return tr("Good evening");
 }
 
 export interface HandoffLink {

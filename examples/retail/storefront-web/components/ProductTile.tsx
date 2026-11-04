@@ -4,7 +4,7 @@
 "use client";
 
 import { useState } from "react";
-import { hasOptions, optionSummary, optionValuesLabel, useStoreFrame } from "web-shared";
+import { hasOptions, optionSummary, optionValuesLabel, tr, useStoreFrame } from "web-shared";
 import type { Product } from "@/lib/types";
 import { flyToCart } from "@/lib/flight";
 import { attributeChips, productGlyph, productTileClass } from "@/lib/format";
@@ -30,7 +30,7 @@ export function ProductTitle({ title, className = "" }: { title: string; classNa
 function ReturnsPromise({ className = "" }: { className?: string }) {
   return (
     <div className={`text-[11px] text-(--ink-soft) ${className}`}>
-      {STORE_POLICY.returnsShort}
+      {tr(STORE_POLICY.returnsShort)}
     </div>
   );
 }
@@ -124,7 +124,7 @@ export function AddButton({
           event.stopPropagation();
           ask(`Add the ${product.title} (${product.product_id}) to my cart.`);
         }}
-        aria-label={`Choose options for ${product.title}`}
+        aria-label={tr("Choose options for {name}", { name: product.title })}
         className="pointer-events-auto absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-(--ink) text-lg font-semibold leading-none text-(--surface) shadow-(--shadow-sm) transition-all hover:scale-105"
       >
         +
@@ -145,7 +145,7 @@ export function AddButton({
         if (added) flyToCart(product, source);
         window.setTimeout(() => setPhase("idle"), added ? 1200 : 1600);
       }}
-      aria-label={`Add ${product.title} to cart`}
+      aria-label={tr("Add {name} to my selection", { name: product.title })}
       className={`pointer-events-auto absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold leading-none text-(--surface) shadow-(--shadow-sm) transition-all hover:scale-105 ${
         phase === "done" ? "bg-(--ok)" : phase === "error" ? "bg-(--warn)" : "bg-(--ink)"
       } ${phase === "busy" ? "animate-pulse" : ""}`}
@@ -193,7 +193,7 @@ export default function ProductTile({
           <ProductImage product={product} className={`w-full ${imageHeight}`} />
           {product.in_stock === false ? (
             <span className="absolute right-1.5 top-1.5 rounded-full bg-(--ink)/85 px-2 py-0.5 text-[11px] font-medium text-(--surface)">
-              Out of stock
+              {tr("Out of stock")}
             </span>
           ) : (
             <LowStockChip product={product} className="absolute right-1.5 top-1.5" />
@@ -268,7 +268,7 @@ export function ProductRow({
           <Rating rating={product.rating} />
           {product.in_stock === false ? (
             <span className="rounded-full bg-(--ink)/85 px-2 py-0.5 text-[11px] font-medium text-(--surface)">
-              Out of stock
+              {tr("Out of stock")}
             </span>
           ) : (
             <LowStockChip product={product} />

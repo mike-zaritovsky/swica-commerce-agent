@@ -51,6 +51,10 @@ config = ShoppingAgentConfig(
     domain_search_notes=profile.DOMAIN_SEARCH_NOTES,
     model=profile.MODEL,
     memory_model=profile.MEMORY_MODEL,
+    # Insurance has nothing to ship: no delivery options tool.
+    enable_fulfillment=False,
+    policy_intent_terms=(*ShoppingAgentConfig().policy_intent_terms, *profile.POLICY_TERMS),
+    policy_intent_cues=(*ShoppingAgentConfig().policy_intent_cues, *profile.POLICY_CUES),
 )
 
 agent = ShoppingAgent(

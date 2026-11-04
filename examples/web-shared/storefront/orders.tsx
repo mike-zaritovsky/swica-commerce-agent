@@ -15,6 +15,7 @@ import { AskButton, Notice, PageHeader, Panel, Pill, Segmented, Skeleton, type T
 import { useStoreFrame } from "./frame";
 import { MoreLink } from "./home";
 import { StorePage } from "./Shell";
+import { tr } from "../i18n";
 
 const STATUS: Record<string, { label: string; tone: Tone }> = {
   processing: { label: "Processing", tone: "muted" },
@@ -55,7 +56,7 @@ export function estimateOf(order: Order): { date: string; note: string | null } 
 
 /** The label for a status, the vertical's own word first ("return_initiated" → "Return requested"). */
 export function orderStatusLabel(status: string, labels?: Record<string, string>): string {
-  return labels?.[status] ?? STATUS[status]?.label ?? status.replaceAll("_", " ");
+  return tr(labels?.[status] ?? STATUS[status]?.label ?? status.replaceAll("_", " "));
 }
 
 export function OrderStatusPill({ status, labels }: { status: string; labels?: Record<string, string> }) {
@@ -179,9 +180,9 @@ export function ArrivingPanel({
   const shown = open.length ? open : orders.slice(0, 2);
   return (
     <Panel
-      title={nouns.cardTitle}
+      title={tr(nouns.cardTitle)}
       subtitle={open.length ? plural(orders.length, nouns.one) : nouns.noneOpen}
-      action={onSeeAll ? <MoreLink label={`All ${nouns.title.toLowerCase()}`} onClick={onSeeAll} /> : null}
+      action={onSeeAll ? <MoreLink label={tr("All {what}", { what: tr(nouns.title.toLowerCase()) })} onClick={onSeeAll} /> : null}
     >
       <ul>
         {shown.map((order) => (
@@ -213,20 +214,20 @@ export function OrdersView({
   const title = nouns.title.toLowerCase();
   return (
     <StorePage>
-      <PageHeader title={nouns.title} subtitle={subtitle}>
+      <PageHeader title={tr(nouns.title)} subtitle={subtitle}>
         <Segmented
-          label={`Filter ${title}`}
+          label={tr("Filter")}
           value={filter}
           onChange={setFilter}
           options={[
-            { id: "all", label: "All", count: all.length },
-            ...nouns.filters.map((entry) => ({ id: entry.id, label: entry.label, count: all.filter(entry.match).length })),
+            { id: "all", label: tr("All"), count: all.length },
+            ...nouns.filters.map((entry) => ({ id: entry.id, label: tr(entry.label), count: all.filter(entry.match).length })),
           ]}
         />
       </PageHeader>
       {orders === null ? (
         failed ? (
-          <Notice>Couldn&apos;t load your {title}. The assistant can still look them up.</Notice>
+          <Notice>{tr("Couldn't load your {what}. The assistant can still look them up.", { what: tr(title) })}</Notice>
         ) : (
           <Skeleton className="h-[320px]" />
         )
@@ -239,7 +240,7 @@ export function OrdersView({
           </ul>
         </Panel>
       ) : (
-        <Notice>No {title} here.</Notice>
+        <Notice>{tr("No {what} here.", { what: tr(title) })}</Notice>
       )}
     </StorePage>
   );

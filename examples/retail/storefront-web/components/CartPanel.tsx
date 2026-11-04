@@ -3,38 +3,11 @@
 
 "use client";
 
-import { AskLink, BagPanel, CheckoutButton, formatMoney, optionValuesLabel, plural, RemoveLink, Stepper, TotalRow, useCatalogIndex, useStoreFrame } from "web-shared";
+import { AskLink, BagPanel, CheckoutButton, optionValuesLabel, RemoveLink, TotalRow, tr, useCatalogIndex, useStoreFrame } from "web-shared";
 import { fetchProducts } from "@/lib/api";
-import { STORE_POLICY } from "@/lib/storePolicy";
+import { fromPrice } from "@/lib/price";
 import type { CartItem, CartPayload, Product } from "@/lib/types";
-import { DeliveryPromise, ProductImage, ProductTitle } from "./ProductTile";
-
-/** The policy says "over" the threshold, so a cart at exactly the threshold is not free. */
-function FreeShippingMeter({ subtotal }: { subtotal: number }) {
-  const threshold = STORE_POLICY.freeShippingThreshold;
-  const free = subtotal > threshold;
-  const remaining = threshold - subtotal;
-  const pct = Math.min((subtotal / threshold) * 100, 100);
-  return (
-    <div data-free-shipping-meter className="mb-3">
-      <div className={`text-[13px] ${free ? "font-semibold text-(--ok)" : "text-(--ink-2)"}`}>
-        {free ? (
-          <>Free shipping on this order ✓</>
-        ) : remaining > 0 ? (
-          <>
-            <span className="font-bold text-(--ink)">{formatMoney(remaining)}</span> away from free shipping
-          </>
-        ) : (
-          <>Anything more ships free</>
-        )}
-      </div>
-      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-(--well)">
-        <div className={`h-full rounded-full transition-[width] duration-500 ease-out ${free ? "bg-(--ok)" : "bg-(--accent)"}`} style={{ width: `${pct}%` }} />
-      </div>
-      {!free ? <div className="mt-1 text-[11.5px] text-(--ink-soft)">Standard shipping is free on orders over {formatMoney(threshold)}.</div> : null}
-    </div>
-  );
-}
+import { ProductImage, ProductTitle } from "./ProductTile";
 
 /** The listing behind a line; a variant's line borrows its family's brand and image. */
 function asProduct(item: CartItem, catalog: Record<string, Product>): Product {
@@ -59,32 +32,39 @@ function lineName(item: CartItem): string {
 }
 
 /** The docked cart. Quantity and checkout are messages to the assistant, so every write is one it made. */
+/** The products the customer wants to apply for. Each is held once (one basic insurance per
+ * person), so there is no quantity stepper; removing and the application are messages to
+ * the assistant, so every write goes through its gates. */
 export default function CartPanel({ cart, checkoutStaged = false }: { cart: CartPayload | null; checkoutStaged?: boolean }) {
   const { ask } = useStoreFrame();
   const items = cart?.items ?? [];
   const count = cart?.item_count ?? 0;
   const catalog = useCatalogIndex(fetchProducts);
+  const countLabel = tr(count === 1 ? "{n} product" : "{n} products", { n: count });
 
   return (
     <BagPanel
-      title="Cart"
-      count={plural(count, "item")}
+      title={tr("My selection")}
+      count={countLabel}
       isEmpty={items.length === 0}
       empty={
         <>
-          Nothing in the cart yet.
+          {tr("Nothing selected yet.")}
           <br />
-          Ask the SWICA Assistant about any insurance product.
+          {tr("Ask the SWICA Assistant about any insurance product.")}
         </>
       }
       footer={
         <>
-          {items.length ? <FreeShippingMeter subtotal={cart?.subtotal ?? 0} /> : null}
-          <TotalRow label={count ? `Subtotal · ${plural(count, "item")}` : "Subtotal"} value={formatMoney(cart?.subtotal ?? 0, cart?.currency)} />
-          <CheckoutButton staged={checkoutStaged} disabled={items.length === 0} prompt="Check out my cart." />
+          <TotalRow
+            label={tr("Starting premiums in total")}
+            value={fromPrice(cart?.subtotal ?? 0, cart?.currency)}
+            note={items.length ? tr("Your personal premium is calculated in the application.") : undefined}
+          />
+          <CheckoutButton staged={checkoutStaged} disabled={items.length === 0} prompt={tr("I would like to apply for my selection.")} />
           {items.length ? (
             <div className="mt-2.5 flex justify-center">
-              <AskLink label="Ask about this cart" prompt="Look over my cart: anything missing or worth swapping?" />
+              <AskLink label={tr("Ask about this selection")} prompt={tr("Look over my selection: is anything missing for my situation?")} />
             </div>
           ) : null}
         </>
@@ -102,23 +82,12 @@ export default function CartPanel({ cart, checkoutStaged = false }: { cart: Cart
                     {product.brand ? <div className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-(--ink-soft)">{product.brand}</div> : null}
                     {/* A two-line clamp cuts long names in half. */}
                     <ProductTitle title={item.title} className="line-clamp-3 text-[13.5px] font-semibold leading-snug text-(--ink)" />
-                    {optionValuesLabel(item) ? <div className="text-[11.5px] text-(--ink-soft)">{optionValuesLabel(item)}</div> : null}
+                    {product.category ? <div className="text-[11.5px] text-(--ink-soft)">{product.category}</div> : null}
                   </div>
-                  <div className="shrink-0 text-right">
-                    <div className="text-[14px] font-bold tabular-nums text-(--ink)">{formatMoney(item.line_total)}</div>
-                    {item.quantity > 1 ? <div className="text-[11px] text-(--ink-soft)">{formatMoney(item.price)} each</div> : null}
-                  </div>
+                  <div className="shrink-0 text-right text-[14px] font-bold tabular-nums text-(--ink)">{fromPrice(item.price, cart?.currency)}</div>
                 </div>
-                <DeliveryPromise product={product} className="mt-0.5" />
                 <div className="mt-2 flex items-center gap-2.5">
-                  <Stepper
-                    quantity={item.quantity}
-                    itemTitle={lineName(item)}
-                    onChange={(quantity) =>
-                      ask(quantity < 1 ? `Remove the ${lineName(item)} from my cart.` : `Change the ${lineName(item)} quantity to ${quantity}.`)
-                    }
-                  />
-                  <RemoveLink itemTitle={lineName(item)} onClick={() => ask(`Remove the ${lineName(item)} from my cart.`)} />
+                  <RemoveLink itemTitle={lineName(item)} onClick={() => ask(tr("Remove {name} from my selection.", { name: lineName(item) }))} />
                 </div>
               </div>
             </li>

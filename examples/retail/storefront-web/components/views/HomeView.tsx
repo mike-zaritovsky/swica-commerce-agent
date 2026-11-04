@@ -9,11 +9,13 @@ import {
   estimateOf,
   Greeting,
   greeting,
+  localeTag,
   HomeSection,
   type Order,
   plural,
   type Starter,
   Starters,
+  tr,
   upcoming,
   useCatalogIndex,
   useStoreFrame,
@@ -39,9 +41,9 @@ function featured(catalog: Record<string, Product>): Product[] {
 }
 
 function Brief({ orders }: { orders: Order[] | null }) {
-  if (!orders) return <>Ask about insurance cover, what affects your premium, or which product fits you.</>;
+  if (!orders) return <>{tr("Ask about insurance cover, what affects your premium, or which product fits you.")}</>;
   const open = upcoming(orders);
-  if (!open.length) return <>Prices shown are starting premiums; your personal premium depends on your age, package, and other details.</>;
+  if (!open.length) return <>{tr("Prices shown are starting premiums; your personal premium depends on your age, model, excess, and other details.")}</>;
   const late = open.filter((order) => order.status === "delayed");
   const next = estimateOf(open.find((order) => order.status !== "delayed") ?? open[0])?.date;
   return (
@@ -77,18 +79,18 @@ export default function HomeView({
   return (
     <div className="flex flex-col gap-4">
       <Greeting
-        eyebrow={now ? now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }) : "\u00a0"}
-        title={<h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] text-(--ink)">{`${now ? greeting(now) : "Hello"}, ${shopperName}`}</h1>}
+        eyebrow={now ? now.toLocaleDateString(localeTag(), { weekday: "long", month: "long", day: "numeric" }) : "\u00a0"}
+        title={<h1 className="text-[28px] font-semibold leading-tight tracking-[-0.02em] text-(--ink)">{`${now ? greeting(now) : tr("Hello")}, ${shopperName}`}</h1>}
       >
         <Brief orders={orders} />
       </Greeting>
       <Starters items={STARTERS} />
       <ArrivingPanel orders={orders} failed={ordersFailed} nouns={NOUNS} thumb={(order) => <OrderThumb order={order} />} onSeeAll={onSeeOrders} />
       {picks.length ? (
-        <HomeSection title="Popular insurance products" subtitle="Starting premiums; open one to ask about it">
+        <HomeSection title={tr("Popular insurance products")} subtitle={tr("Starting premiums; open one to ask about it")}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {picks.map((product) => (
-              <ProductTile key={product.product_id} product={product} fluid onOpen={(item) => ask(`Tell me about the ${item.title}.`)} />
+              <ProductTile key={product.product_id} product={product} fluid onOpen={(item) => ask(tr("Tell me about {name}.", { name: item.title }))} />
             ))}
           </div>
         </HomeSection>

@@ -51,12 +51,29 @@ Open http://localhost:3000. Each model call logs the gateway's `X-Token-Budget-*
 on the `demo_common.gateway` logger, and the turn's `cache_read_input_tokens` on the
 runtime logger; from the second turn the cached figure should be above zero.
 
+## Behaviour
+
+- Languages: English and German (Swiss Standard German). The EN | DE switch in the app bar
+  sets the interface language and sends it as `page.extra.ui_language` with each message;
+  a message written in the other language switches both.
+- Terms: `data/policies.json` holds facts from swica.ch (excess, discounts, switching,
+  payment, contact), each with its source page. `search_policies` always returns the
+  contact entry, so a question the terms do not answer ends with SWICA's phone number,
+  consultation booking, contact form, or premium calculator.
+- Selection and application: each product is held once, and one basic insurance (KVG) per
+  cart, so a new KVG model replaces the previous one. Checkout hands off to the Shopify
+  checkout as the application; prices stay "from" premiums throughout.
+
 ## Where things are
 
 - `api/agent_profile.py`: the agent's name, voice, and insurance rules ("from" premiums,
   personal premium calculated separately).
-- `api/shopify_backend.py`: `StorefrontBackend` over the Shopify Storefront API.
+- `api/shopify_backend.py`: `StorefrontBackend` over the Shopify Storefront API, with the
+  cart rules and the terms search.
+- `data/policies.json`: SWICA's terms and contact details.
 - `examples/retail/storefront-web/app/brand-theme.css`: colours, radii, and type taken from
   swica.ch's design tokens; Outfit stands in for the licensed SWICA typeface.
 - `examples/retail/storefront-web/lib/price.ts`: the "from" price label and the CHF default.
 - `examples/retail/storefront-web/components/views/HomeView.tsx`: the start prompts.
+- `examples/retail/storefront-web/lib/i18n-de.ts`: the German interface text;
+  `examples/web-shared/i18n.ts` is the shared `tr` and language switch.

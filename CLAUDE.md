@@ -14,6 +14,7 @@ paths each, four vertical examples, and a Claude Code plugin.
 - `*/runtime-agent-sdk/`: each agent as `ClaudeAgentOptions`, with a console.
 - `*/managed-agents/`: the manifest directory (with the derived `system.md`) and the role's MCP server.
 - `examples/demo_common/` and `examples/web-shared/`: what the verticals' APIs and web apps share; `examples/` is the npm workspace.
+- `examples/web-shared/i18n.ts`: interface language (`tr`, `setLocale`, `detectLanguage`); apps that register no dictionary stay English.
 - `examples/demo_common/gateway.py`: the `AsyncAnthropic` client for the dentsu AI gateway, with key fallback.
 - `examples/shopify_demo/`: the SWICA insurance agent over a Shopify store; its README says how to run it.
 - `examples/<vertical>/`: `api/`, `data/`, `storefront-web/`, `merchant-web/`; ports 8000-8003, 3000-3003, 3100-3103.

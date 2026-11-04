@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { Icon } from "../icons";
 import { IconButton } from "../ui";
 import { useStoreFrame } from "./frame";
+import { tr } from "../i18n";
 
 /**
  * Header with the count, the lines, and a footer for totals and the primary action. The vertical
@@ -43,7 +44,7 @@ export function BagPanel({
         >
           {count}
         </span>
-        <IconButton icon="x" label={`Close ${title.toLowerCase()}`} onClick={closePanel} className="ml-auto xl:hidden" />
+        <IconButton icon="x" label={tr("Close")} onClick={closePanel} className="ml-auto xl:hidden" />
       </div>
       <div className="panel-scroll min-h-0 flex-1 overflow-y-auto px-[18px] py-3.5">
         {isEmpty ? (
@@ -141,7 +142,7 @@ export function RemoveLink({ itemTitle, onClick }: { itemTitle: string; onClick:
       aria-label={`Remove ${itemTitle}`}
       className="text-[12px] text-(--ink-soft) underline-offset-2 hover:text-(--danger) hover:underline disabled:opacity-40"
     >
-      Remove
+      {tr("Remove")}
     </button>
   );
 }
@@ -157,17 +158,17 @@ export function CheckoutButton({ staged, disabled, prompt }: { staged: boolean; 
           const cards = document.querySelectorAll("[data-checkout-card]");
           const card = cards[cards.length - 1];
           if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
-          else ask("Show me the checkout summary again.");
+          else ask(tr("Show me the checkout summary again."));
         }}
         className="mt-3 w-full rounded-(--radius) border border-(--line-strong) bg-(--card) py-2.5 text-[14px] font-semibold text-(--ink) transition hover:border-(--accent)"
       >
-        View summary
+        {tr("View summary")}
       </button>
     );
   }
   return (
     <button type="button" onClick={() => ask(prompt)} disabled={disabled} className="btn-primary mt-3 w-full">
-      Check out
+      {tr("Check out")}
     </button>
   );
 }

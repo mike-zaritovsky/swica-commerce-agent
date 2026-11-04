@@ -7,6 +7,7 @@ import { type ButtonHTMLAttributes, type ReactNode, useEffect, useId, useState }
 import { createPortal } from "react-dom";
 import { formatChangePct } from "./format";
 import { Icon, type IconName } from "./icons";
+import { tr } from "./i18n";
 
 export type Tone = "ok" | "warn" | "danger" | "info" | "violet" | "accent" | "muted";
 
@@ -388,7 +389,7 @@ export function Sheet({
   onClose,
   footer,
   children,
-  closeLabel = "Close",
+  closeLabel = tr("Close"),
 }: {
   title: ReactNode;
   detail?: ReactNode;

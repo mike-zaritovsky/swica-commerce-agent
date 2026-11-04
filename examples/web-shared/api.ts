@@ -12,6 +12,8 @@ const SESSION_HEADER = "X-Session-Id";
  */
 export class AgentApi {
   session: string | null = null;
+  /** Sent with each chat message as `page.extra` (the storefront's interface language). */
+  pageExtra: Record<string, unknown> | null = null;
   readonly base: string;
 
   /** `root` is the API's URL; `prefix` the role's route prefix ("/api", "/api/merchant"). */
@@ -109,7 +111,7 @@ export class AgentApi {
     const response = await fetch(`${this.base}/chat`, {
       method: "POST",
       headers: this.headers(true),
-      body: JSON.stringify({ message }),
+      body: JSON.stringify(this.pageExtra ? { message, page: { extra: this.pageExtra } } : { message }),
     });
     if (!response.ok || !response.body) throw new Error(`chat request failed: ${response.status}`);
     yield* readEventStream(response.body);

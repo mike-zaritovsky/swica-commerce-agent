@@ -10,12 +10,15 @@ SHOPIFY_VENDOR (only products from this vendor are listed; default SWICA, empty 
 
 from __future__ import annotations
 
+import json
 import os
 import re
+from pathlib import Path
 from typing import Any
 
 import httpx
 
+from demo_common.storefront_fixtures import search_help
 from shopping_agent import (
     Cart,
     CartItem,
@@ -31,6 +34,28 @@ from shopping_agent import (
     Unavailable,
     UserPreferences,
 )
+
+# Categories a cart holds one product of: a person has one basic insurance (KVG).
+SINGLE_LINE_CATEGORIES = frozenset({"KVG"})
+
+POLICIES_FILE = Path(__file__).resolve().parent.parent / "data" / "policies.json"
+
+
+def load_policies(path: Path) -> list[Policy]:
+    """The help entries, each with its source page appended so the agent can cite it."""
+    rows = json.loads(path.read_text(encoding="utf-8"))["policies"]
+    return [
+        Policy(
+            policy_id=row["policy_id"],
+            title=row["title"],
+            category=row.get("category"),
+            content=f"{row['content']} (Source: {row['source']})"
+            if row.get("source")
+            else row["content"],
+        )
+        for row in rows
+    ]
+
 
 # Replaced in every query with SHOPIFY_COUNTRY (see ``ShopifyBackend._gql``).
 COUNTRY_TOKEN = "__COUNTRY__"
@@ -58,6 +83,7 @@ class ShopifyBackend(StorefrontBackend):
         self._country = country
         self._default_currency = os.environ.get("SHOPIFY_CURRENCY", "CHF").strip().upper()
         self._vendor = os.environ.get("SHOPIFY_VENDOR", "SWICA").strip().lower()
+        self._policies = load_policies(POLICIES_FILE)
 
     def _is_listed(self, node: dict) -> bool:
         """Whether a product belongs to the catalog this agent sells: the configured
@@ -461,20 +487,44 @@ class ShopifyBackend(StorefrontBackend):
     async def add_to_cart(
         self, session: ShoppingSessionContext, product_id: str, quantity: int
     ) -> Cart:
+        """Insurance rules, as telecom's single-line plans: each product is held once
+        (quantity 1), and one basic insurance (KVG) per cart, so a new KVG model replaces
+        the one already there. Supplementary products (VVG) combine freely."""
+        del quantity
         variant_gid = await self._resolve_first_variant_id(product_id)
+        variant_id = self._parse_gid(variant_gid)
         cart_id = await self._get_or_create_cart_id(session.session_id)
-        line = {"merchandiseId": variant_gid, "quantity": quantity}
+        line = {"merchandiseId": variant_gid, "quantity": 1}
 
-        if cart_id:
-            data = await self._gql(self._CART_LINES_ADD, {"cartId": cart_id, "lines": [line]})
-            cart_data = data.get("cartLinesAdd", {}).get("cart")
-        else:
+        if not cart_id:
             data = await self._gql(self._CART_CREATE, {"lines": [line]})
             cart_data = data.get("cartCreate", {}).get("cart")
             if cart_data:
                 self._session_carts[session.session_id] = cart_data["id"]
+            return self._map_cart(cart_data)
 
-        return self._map_cart(cart_data)
+        raw = await self._get_raw_cart(cart_id) or {}
+        if self._find_line_id(raw, variant_id):
+            return self._map_cart(raw)  # already held; an insurance is taken once
+        if self._category_of(product_id) in SINGLE_LINE_CATEGORIES:
+            replaced = [
+                node["id"]
+                for node in raw.get("lines", {}).get("nodes", [])
+                if self._category_of(
+                    self._parse_gid(node.get("merchandise", {}).get("product", {}).get("id", ""))
+                )
+                in SINGLE_LINE_CATEGORIES
+            ]
+            if replaced:
+                await self._gql(self._CART_LINES_REMOVE, {"cartId": cart_id, "lineIds": replaced})
+        data = await self._gql(self._CART_LINES_ADD, {"cartId": cart_id, "lines": [line]})
+        return self._map_cart(data.get("cartLinesAdd", {}).get("cart"))
+
+    def _category_of(self, product_id: str) -> str:
+        product = self.product(product_id)
+        if product is not None and product.variant_of:
+            product = self.product(product.variant_of) or product
+        return (product.category or "") if product else ""
 
     async def update_cart_item(
         self, session: ShoppingSessionContext, product_id: str, quantity: int
@@ -490,7 +540,8 @@ class ShopifyBackend(StorefrontBackend):
             return self._map_cart(raw)
         data = await self._gql(
             self._CART_LINES_UPDATE,
-            {"cartId": cart_id, "lines": [{"id": line_id, "quantity": quantity}]},
+            # Each insurance is held once: a quantity above 1 is capped, 0 removes it.
+            {"cartId": cart_id, "lines": [{"id": line_id, "quantity": min(quantity, 1)}]},
         )
         return self._map_cart(data.get("cartLinesUpdate", {}).get("cart"))
 
@@ -516,7 +567,7 @@ class ShopifyBackend(StorefrontBackend):
         raw = await self._get_raw_cart(cart_id)
         if not raw or not raw.get("checkoutUrl"):
             return []
-        return [CheckoutHandoff(url=raw["checkoutUrl"], label="Complete purchase on Shopify")]
+        return [CheckoutHandoff(url=raw["checkoutUrl"], label="Continue to application")]
 
     # ------------------------------------------------------------------
     # Customer context (stubbed for demo)
@@ -539,20 +590,15 @@ class ShopifyBackend(StorefrontBackend):
         return None
 
     async def search_policies(self, session: ShoppingSessionContext, query: str) -> list[Policy]:
-        return [
-            Policy(
-                policy_id="shipping",
-                title="Shipping Policy",
-                category="shipping",
-                content="Standard shipping 3-5 business days. Free shipping on orders over CHF 49.",
-            ),
-            Policy(
-                policy_id="returns",
-                title="Return Policy",
-                category="returns",
-                content="30-day return policy. Items must be unused and in original packaging.",
-            ),
-        ]
+        """SWICA's terms from ``data/policies.json``, ranked by term overlap. The contact
+        entry always comes back too, so a question the terms do not answer still gets a
+        way to reach SWICA."""
+        del session
+        found = search_help(self._policies, query)
+        contact = next((p for p in self._policies if p.policy_id == "contact"), None)
+        if contact and contact not in found:
+            found.append(contact)
+        return found
 
     # ------------------------------------------------------------------
     # Fulfillment (simplified)
