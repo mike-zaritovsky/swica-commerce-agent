@@ -92,8 +92,12 @@ def describe(error: Exception) -> str:
 
 def report(step: str, ok: bool, detail: str, recorder: BudgetRecorder) -> bool:
     print(f"  [{'OK' if ok else 'FAIL'}] {step}: {detail}")
-    for name, value in sorted(recorder.budget.items()):
-        print(f"         {name}: {value}")
+    shown = ("tokens-this-call", "cost-this-call", "remaining", "tier")
+    budget = {k.lower().removeprefix("x-token-budget-"): v for k, v in recorder.budget.items()}
+    line = "  ".join(f"{name}={budget[name]}" for name in shown if name in budget)
+    if line:
+        print(f"         {line}")
+    recorder.budget = {}
     return ok
 
 
@@ -107,7 +111,7 @@ async def check(credential: GatewayCredential) -> bool:
         try:
             message = await client.messages.create(
                 model=model,
-                max_tokens=50,
+                max_tokens=300,
                 messages=[{"role": "user", "content": "Say hello in five words."}],
             )
             text = "".join(b.text for b in message.content if b.type == "text")
