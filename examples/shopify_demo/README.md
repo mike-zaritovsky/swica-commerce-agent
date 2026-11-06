@@ -87,6 +87,7 @@ In production the panel needs `AGENT_URL` on a public https origin that SWICA ad
 
 ## Where things are
 
+- `DEMO.md`: a demo conversation and what each answer shows.
 - `api/agent_profile.py`: the agent's name, voice, and insurance rules ("from" premiums,
   personal premium calculated separately).
 - `api/shopify_backend.py`: `StorefrontBackend` over the Shopify Storefront API, with the
