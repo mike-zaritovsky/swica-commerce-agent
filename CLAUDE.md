@@ -30,6 +30,7 @@ API over a Shopify store, with its storefront and swica.ch embed.
 ## Conventions
 
 - Python 3.11+, `ruff` (root `ruff.toml`), `pytest` (root `pytest.ini`), type hints, `pydantic` schemas; the storefront is Next.js and TypeScript.
+- `examples/package-lock.json` is regenerated only from scratch (delete `node_modules` and the lockfile, then `npm install`); regenerating over an installed tree drops other platforms' native packages and breaks macOS and Windows installs.
 - Interface text goes through `tr()`; German entries in `storefront-web/lib/i18n-de.ts` are Swiss Standard German (no sharp s).
 - Prose: plain declarative sentences; a README says what a thing is, how to run it, and where its interfaces are.
 - A new module updates this file and its README.
