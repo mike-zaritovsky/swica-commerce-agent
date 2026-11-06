@@ -51,6 +51,20 @@ Open http://localhost:3000. Each model call logs the gateway's `X-Token-Budget-*
 on the `demo_common.gateway` logger, and the turn's `cache_read_input_tokens` on the
 runtime logger; from the second turn the cached figure should be above zero.
 
+## Embed on swica.ch
+
+`embed/swica-embed.js` adds the assistant to www.swica.ch: an entry in the site's "How can we
+help you?" menu and a floating button in the site's style, both opening the storefront
+(`AGENT_URL`, default `http://localhost:3000/`) in the page's language. Run it on swica.ch in
+the DevTools console, or install it as a Tampermonkey userscript so it runs on every page load
+(the header at its top sets the match).
+
+swica.ch's Content-Security-Policy lists the sites it allows in iframes, and `AGENT_URL` is not
+on it, so the script opens the assistant in a popup window docked to the right. The side panel
+opens instead when the CSP is lifted: in production by adding `AGENT_URL`'s origin to the
+site's `frame-src`, for a local demo by a browser extension that disables the CSP.
+`AGENT_URL` on localhost reaches only the machine the storefront runs on.
+
 ## Behaviour
 
 - Languages: English and German (Swiss Standard German). The EN | DE switch in the app bar

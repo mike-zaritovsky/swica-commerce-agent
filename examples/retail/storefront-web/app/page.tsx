@@ -52,13 +52,17 @@ export default function StorefrontPage() {
   );
 
   const locale = useLocale();
-  // The chosen language is remembered per browser and restored after mount, so the server
-  // render (always English) and the first client render agree.
+  // The language comes from `?lang=en|de` (the embed passes the host page's language), else
+  // the choice remembered in this browser; read after mount, so the server render (always
+  // English) and the first client render agree.
   useEffect(() => {
+    const asked = new URLSearchParams(window.location.search).get("lang");
+    let saved: string | null = null;
     try {
-      const saved = window.localStorage.getItem(LOCALE_KEY);
-      if (saved === "en" || saved === "de") setLocale(saved as Locale);
+      saved = window.localStorage.getItem(LOCALE_KEY);
     } catch {}
+    const chosen = asked ?? saved;
+    if (chosen === "en" || chosen === "de") setLocale(chosen as Locale);
   }, []);
   useEffect(() => {
     api.pageExtra = { ui_language: locale };
