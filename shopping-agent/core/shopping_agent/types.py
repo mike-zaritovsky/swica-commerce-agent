@@ -24,8 +24,7 @@ class Product(BaseModel):
     own id, price, and stock, ``option_values`` (one value per option), and the family's id
     in ``variant_of``; the cart takes its id like any product's. Only the variants listed
     exist. A price computed per request (dates, party size) goes in
-    ``SearchFilters.attributes``; ``docs/backends.md`` has the mapping from common catalog
-    models, the family size limit, and what else is not a variant."""
+    ``SearchFilters.attributes``."""
 
     product_id: str
     title: str

@@ -7,19 +7,8 @@ import os
 import pytest
 
 from demo_common import host as host_module
-from demo_common import host_approval_default, load_demo_env, spawn_background
+from demo_common import load_demo_env, spawn_background
 from demo_common.host import _background_tasks
-
-
-@pytest.mark.parametrize(
-    ("value", "expected"), [(None, True), ("0", False), ("1", True), ("", True), ("true", True)]
-)
-def test_only_an_explicit_zero_turns_host_approval_off(monkeypatch, value, expected):
-    if value is None:
-        monkeypatch.delenv("MERCHANT_REQUIRE_HOST_APPROVAL", raising=False)
-    else:
-        monkeypatch.setenv("MERCHANT_REQUIRE_HOST_APPROVAL", value)
-    assert host_approval_default() is expected
 
 
 @pytest.fixture

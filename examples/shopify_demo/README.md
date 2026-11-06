@@ -1,9 +1,8 @@
 # SWICA insurance agent (Shopify demo)
 
 The shopping agent over a Shopify store whose products are SWICA insurance products. The
-API (`api/main.py`, port 8000) serves the storefront routes and the merchant routes under
-`/api/merchant`; the UI is `examples/retail/storefront-web` (port 3000), themed for
-embedding on swica.ch.
+API (`api/main.py`, port 8000) serves the storefront routes; the UI is `storefront-web/`
+(port 3000), themed for embedding on swica.ch.
 
 ## Configure
 
@@ -44,7 +43,7 @@ uvicorn shopify_demo.api.main:app --app-dir examples --reload --port 8000
 
 ```bash
 cd examples && npm ci
-cd retail/storefront-web && npx next dev -p 3000
+cd shopify_demo/storefront-web && npx next dev -p 3000
 ```
 
 Open http://localhost:3000. Each model call logs the gateway's `X-Token-Budget-*` headers
@@ -93,9 +92,9 @@ In production the panel needs `AGENT_URL` on a public https origin that SWICA ad
 - `api/shopify_backend.py`: `StorefrontBackend` over the Shopify Storefront API, with the
   cart rules and the terms search.
 - `data/policies.json`: SWICA's terms and contact details.
-- `examples/retail/storefront-web/app/brand-theme.css`: colours, radii, and type taken from
+- `storefront-web/app/brand-theme.css`: colours, radii, and type taken from
   swica.ch's design tokens; Outfit stands in for the licensed SWICA typeface.
-- `examples/retail/storefront-web/lib/price.ts`: the "from" price label and the CHF default.
-- `examples/retail/storefront-web/components/views/HomeView.tsx`: the start prompts.
-- `examples/retail/storefront-web/lib/i18n-de.ts`: the German interface text;
+- `storefront-web/lib/price.ts`: the "from" price label and the CHF default.
+- `storefront-web/components/views/HomeView.tsx`: the start prompts.
+- `storefront-web/lib/i18n-de.ts`: the German interface text;
   `examples/web-shared/i18n.ts` is the shared `tr` and language switch.

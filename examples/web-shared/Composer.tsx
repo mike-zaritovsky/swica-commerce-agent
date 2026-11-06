@@ -29,7 +29,7 @@ const VARIANTS = {
   },
 };
 
-/** A prefill only fills the draft. screenshot_tour.py waits on the "Working…" placeholder. */
+/** A prefill only fills the draft. */
 export function Composer({
   send,
   ready,

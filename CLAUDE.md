@@ -1,59 +1,42 @@
-# commerce-agents
+# swica-commerce-agent
 
-For agents working in this repo, commerce-builder plugin users included. The public
-reference for commerce agents on Claude: a shopping agent and a merchant agent on three
-paths each, four vertical examples, and a Claude Code plugin.
+For agents working in this repo: the SWICA insurance agent, a shopping agent on the Messages
+API over a Shopify store, with its storefront and swica.ch embed.
 
 ## Layout
 
-- `commerce-common/commerce_common/`: what both roles share; its `__init__` lists the modules.
+- `commerce-common/commerce_common/`: the shared mechanisms; its `__init__` lists the modules.
 - `shopping-agent/core/shopping_agent/`: types, `StorefrontBackend`, config, prompt, `tools/`, gates, enrichment, executor.
-- `merchant-agent/core/merchant_agent/`: the merchant equivalents, plus `changes.py` and `analysis.py`.
-- `*/skills/`: five flows per role, one `SKILL.md` each.
-- `*/runtime-messages-api/`: `ShoppingAgent`, `MerchantAgent`, the merchant analysis delegate.
-- `*/runtime-agent-sdk/`: each agent as `ClaudeAgentOptions`, with a console.
-- `*/managed-agents/`: the manifest directory (with the derived `system.md`) and the role's MCP server.
-- `examples/demo_common/` and `examples/web-shared/`: what the verticals' APIs and web apps share; `examples/` is the npm workspace.
-- `examples/web-shared/i18n.ts`: interface language (`tr`, `setLocale`, `detectLanguage`); apps that register no dictionary stay English.
-- `examples/demo_common/gateway.py`: the `AsyncAnthropic` client for the dentsu AI gateway, with key fallback.
-- `examples/shopify_demo/`: the SWICA insurance agent over a Shopify store; its README says how to run it.
-- `examples/<vertical>/`: `api/`, `data/`, `storefront-web/`, `merchant-web/`; ports 8000-8003, 3000-3003, 3100-3103.
-- `plugins/commerce-builder/`: six skills, four commands; `.claude-plugin/marketplace.json` points at it.
-- `docs/`: `safety.md`, `backends.md`, `deployment.md`. `scripts/`: install, demo, smoke, screenshots, check, deploy, verify.
-- `tests/`: the suites that span packages (both roles on all three paths); each package keeps its own `tests/`.
+- `shopping-agent/runtime-messages-api/`: `ShoppingAgent`, the turn loop.
+- `shopping-agent/skills/`: five flows, one `SKILL.md` each.
+- `examples/shopify_demo/`: the SWICA demo: `api/` (Shopify backend, agent profile, wiring), `data/` (terms, memory seed), `storefront-web/` (Next.js), `embed/` (swica.ch script); its README says how to run it, `DEMO.md` is a demo conversation.
+- `examples/demo_common/`: host code the API uses; `gateway.py` is the `AsyncAnthropic` client for the dentsu AI gateway, with key fallback.
+- `examples/web-shared/`: the storefront's shared web code; `i18n.ts` is the interface language (`tr`, `setLocale`, `detectLanguage`).
+- `scripts/`: `gateway_smoke.py`, `swica_demo.py`, `install.sh`.
+- `tests/`: suites that span packages; each package keeps its own `tests/`.
 
-`requirements.txt` installs the seven packages and their pinned dependencies (`requirements-dev.txt`
-adds pytest and ruff); `scripts/install.sh` runs it.
+`requirements.txt` installs the three packages and their pinned dependencies
+(`requirements-dev.txt` adds pytest and ruff).
 
 ## Design rules
 
 - One model owns the conversation; a rule goes in a tool description, the prompt, or a skill by how often it applies.
 - The static prompt and `tools[]` are the same bytes on every turn; per-request data goes in the fenced block after the breakpoint.
 - UI is presentation tool calls, validated and filled in on the server, streamed as `ui` events.
-- Third-party content is fenced data; writes are provenance-gated and capped in code; `checkout` charges nothing; merchant writes apply only through host approval.
-- Core is domain-neutral; a vertical adds UI through `PresentationExtension` and keeps the rest to itself.
-- Each mechanism is defined once, in `commerce_common` or a role core, and shared by all three paths.
-
-## Fictional and original
-
-No real company, brand, product, or person appears: the only company is ACME and its
-lines; every brand, prompt, schema, and figure is invented here. Two exceptions:
-deployment and integration targets (the README's "MCP connectors" section; platform and
-SDK names in `docs/deployment.md`, the README's deploying section, and the platform tests),
-and CC0 category photos listed in the `IMAGE-CREDITS.md` beside them. When in doubt,
-redesign rather than rename.
+- Third-party content is fenced data; writes are provenance-gated and capped in code; `checkout` charges nothing.
+- Core is domain-neutral; SWICA specifics live in `examples/shopify_demo/` (`agent_profile.py`, the backend, the storefront).
+- Secrets live in `.env` only, never in the repository.
 
 ## Conventions
 
-- Python 3.11+, `ruff` (root `ruff.toml`), `pytest` (root `pytest.ini`), type hints, `pydantic` schemas; web apps are Next.js and TypeScript.
-- Skill descriptions name the request class, without sample utterances; tool descriptions say when the tool applies; examples stay schematic.
-- A change to prompt text, a tool description, a skill, or a fence notice re-derives `system.md`; `scripts/check.py` compares them.
-- Prose: plain declarative sentences; one term per thing; each fact once, naming its module; each role in its own terms; a README says what a thing is, how to run it, and where its interfaces are; no history, dates, or process narrative; cut before restyling.
+- Python 3.11+, `ruff` (root `ruff.toml`), `pytest` (root `pytest.ini`), type hints, `pydantic` schemas; the storefront is Next.js and TypeScript.
+- Interface text goes through `tr()`; German entries in `storefront-web/lib/i18n-de.ts` are Swiss Standard German (no sharp s).
+- Prose: plain declarative sentences; a README says what a thing is, how to run it, and where its interfaces are.
 - A new module updates this file and its README.
 
 ## Verify
 
 ```bash
-ruff check . && ruff format --check . && pytest && python scripts/check.py
-python scripts/verify_all.py          # adds deploy dry runs and web builds
+ruff check . && ruff format --check . && pytest
+(cd examples && npm run build)
 ```

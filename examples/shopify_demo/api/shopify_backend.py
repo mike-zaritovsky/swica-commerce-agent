@@ -613,10 +613,8 @@ class ShopifyBackend(StorefrontBackend):
         ]
 
     # ------------------------------------------------------------------
-    # Full catalog — search_products only fetches what a query matches, but the
-    # merchant portal (inventory alerts, browse, SQL analysis) needs the whole
-    # store. This walks products(first, after) rather than search(), and fills
-    # self.products the same way search/get_product_details do.
+    # Full catalog: search_products fetches what a query matches; the home page and
+    # the cart rules need every listed product, so this walks products(first, after).
     # ------------------------------------------------------------------
 
     _CATALOG_PAGE_QUERY = """
@@ -656,11 +654,9 @@ class ShopifyBackend(StorefrontBackend):
     async def list_catalog(
         self, *, page_size: int = 50, max_products: int = 250
     ) -> list[ProductDetails]:
-        """Fetch every product (paginated), caching each into ``self.products`` exactly
-        as ``search_products``/``get_product_details`` do. Call once at merchant-backend
-        startup and again whenever the portal needs a fresher view; there is no
-        change-notification from Shopify here, so staleness is bounded by how often the
-        caller re-fetches, not tracked automatically."""
+        """Fetch every listed product (paginated), caching each into ``self.products`` as
+        ``search_products`` and ``get_product_details`` do. The API calls it at startup;
+        Shopify sends no change notifications, so the cache is as fresh as the last call."""
         collected: list[ProductDetails] = []
         cursor: str | None = None
         while len(collected) < max_products:
@@ -680,19 +676,8 @@ class ShopifyBackend(StorefrontBackend):
         return collected
 
     # ------------------------------------------------------------------
-    # DemoStorefront protocol extras (demo_common.host) — required to mount the
-    # shared merchant portal router alongside the storefront routes.
+    # DemoStorefront protocol extras (demo_common.host).
     # ------------------------------------------------------------------
 
     def reset_session(self, session_id: str) -> None:
         self._session_carts.pop(session_id, None)
-
-    def recent_orders(self, limit: int = 6) -> list[Order]:
-        # Order history lives in Shopify's Admin API, which this demo backend does not
-        # call (only the Storefront API). The merchant portal's "recent orders" panel
-        # reads the merchant backend's own orders.json instead — see api/merchant.py.
-        # Sync on purpose: the shared merchant router calls this without ``await``
-        # (matching examples/retail/api/mock_retail.py's own recent_orders, which is
-        # sync too) — the DemoStorefront Protocol's "async def" in host.py doesn't match
-        # how it's actually called, so the real contract is: keep this synchronous.
-        return []

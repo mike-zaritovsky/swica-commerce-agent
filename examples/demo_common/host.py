@@ -25,7 +25,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from commerce_common.streaming import AgentEvent, to_sse
 from commerce_common.turn import session_tag
-from shopping_agent import Cart, Order, ProductDetails, ShoppingSessionContext
+from shopping_agent import Cart, ProductDetails, ShoppingSessionContext
 
 from .sessions import SessionConflictError, SessionRecord, SessionStore
 
@@ -35,10 +35,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 class DemoStorefront(Protocol):
-    """What the shared routes use from a vertical's mock storefront on top of the
+    """What the shared routes use from a storefront backend on top of the
     ``StorefrontBackend`` interface it implements: the listings (``products``), a lookup
-    by id that also resolves a variant, the store name, per-session cleanup, and the
-    cross-user order feed the merchant overview shows."""
+    by id that also resolves a variant, the store name, and per-session cleanup."""
 
     store_name: str
     products: dict[str, ProductDetails]
@@ -46,8 +45,6 @@ class DemoStorefront(Protocol):
     def product(self, product_id: str) -> ProductDetails | None: ...
 
     def reset_session(self, session_id: str) -> None: ...
-
-    def recent_orders(self, limit: int = 6) -> list[Order]: ...
 
     async def get_cart(self, session: ShoppingSessionContext) -> Cart: ...
 
@@ -67,11 +64,6 @@ def load_demo_env(example_root: Path) -> None:
     else:
         load_dotenv(example_root / ".env", override=False)
         load_dotenv(REPO_ROOT / ".env", override=False)
-
-
-def host_approval_default() -> bool:
-    """Merchant portals require host approval unless ``MERCHANT_REQUIRE_HOST_APPROVAL=0``."""
-    return os.environ.get("MERCHANT_REQUIRE_HOST_APPROVAL", "1") != "0"
 
 
 # The event loop holds only weak references to tasks, so fire-and-forget work (memory

@@ -1,8 +1,6 @@
-"""Shopify demo API: a real Shopify store behind the shared storefront routes, plus the
-merchant portal (MerchantBackend over the same Shopify catalog) under /api/merchant.
+"""SWICA insurance agent API: the Shopify store behind the shared storefront routes.
 
     uvicorn shopify_demo.api.main:app --app-dir examples --reload --port 8000
-    (cd examples/shopify_demo/merchant-web && npm run dev)   # :3100, once that app exists
 
 Set SHOPIFY_STORE_DOMAIN and SHOPIFY_STOREFRONT_TOKEN in .env before running. With
 FOUNDRY_SUBSCRIPTION_KEY set, model calls go through the dentsu gateway
@@ -30,7 +28,6 @@ from shopping_agent import ShoppingAgentConfig
 from shopping_agent_runtime import ShoppingAgent
 
 from . import agent_profile as profile
-from .merchant import create_merchant_router
 from .shopify_backend import ShopifyBackend
 
 EXAMPLE_DIR = Path(__file__).resolve().parent.parent
@@ -79,7 +76,7 @@ app = host.app
 # `build_storefront_host` gives its FastAPI app a `lifespan=` context manager (for
 # seeding memory at boot) — and once an app has `lifespan=`, the older `@app.on_event`
 # API is simply never called, no error, no warning. So instead of `@app.on_event`,
-# wrap the existing lifespan: warm the merchant catalog first, then hand off to it.
+# wrap the existing lifespan: load the catalog first (the home page lists it), then hand off.
 _host_lifespan = app.router.lifespan_context
 
 
@@ -91,10 +88,6 @@ async def _lifespan_with_catalog_warmup(app: FastAPI):
 
 
 app.router.lifespan_context = _lifespan_with_catalog_warmup
-
-app.include_router(
-    create_merchant_router(backend, InMemoryMemoryStore(), client=client), prefix="/api/merchant"
-)
 
 
 @app.post("/api/cart/add")

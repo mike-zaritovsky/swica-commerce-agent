@@ -1,10 +1,9 @@
 {
-  "name": "acme-examples",
+  "name": "swica-examples",
   "private": true,
   "workspaces": [
     "web-shared",
-    "*/storefront-web",
-    "*/merchant-web"
+    "shopify_demo/storefront-web"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present"

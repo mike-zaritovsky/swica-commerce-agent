@@ -1,10 +1,8 @@
 # shopping-agent/core (package `shopping_agent`)
 
-Everything the shopping agent's three paths agree on. The turn loops live in
-`../runtime-messages-api/` and `../runtime-agent-sdk/`; the hosted path's server is in
-`../managed-agents/`. A deployment implements `StorefrontBackend` and constructs a
-`ShoppingAgentConfig`; the rest is consumed as is. [`docs/backends.md`](../../docs/backends.md) covers mapping a catalog
-with options and variants onto `Product`.
+The shopping agent's types, backend interface, config, prompt, tools, and gates. The turn
+loop lives in `../runtime-messages-api/`. A deployment implements `StorefrontBackend` and
+constructs a `ShoppingAgentConfig`; the rest is consumed as is.
 
 | Module | Holds |
 |---|---|

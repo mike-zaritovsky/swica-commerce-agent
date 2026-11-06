@@ -15,10 +15,6 @@ from pydantic import BaseModel
 from commerce_common.execution import LOAD_SKILL, STATUS_FIELD, STATUS_MAX_CHARS
 from commerce_common.presentation import PresentationExtension, PresentationPayload
 from commerce_common.prompt_assembly import with_tool_cache_control
-from merchant_agent import enrichment as merchant_enrichment
-from merchant_agent import prompt as merchant_prompt
-from merchant_agent.memory import MERCHANT_MEMORY_EXTRACTION_PROMPT
-from merchant_agent.tools import registry as merchant_registry
 from shopping_agent import enrichment as shopping_enrichment
 from shopping_agent import prompt as shopping_prompt
 from shopping_agent.memory import SHOPPING_MEMORY_EXTRACTION_PROMPT
@@ -57,24 +53,6 @@ ROLES = {
         SHOPPING_MEMORY_EXTRACTION_PROMPT,
         "customer",
         "current_project",
-    ),
-    "merchant": Prompting(
-        merchant_prompt.build_static_system,
-        merchant_registry.build_tools,
-        (
-            "metrics_grounding_gate",
-            "metrics_intent_terms",
-            "queue_grounding_gate",
-            "staging_followthrough_gate",
-            "max_price_delta_pct",
-            "protected_fields",
-        ),
-        "present_digest",
-        merchant_enrichment.PRESENTATION_COMPONENTS,
-        {},
-        MERCHANT_MEMORY_EXTRACTION_PROMPT,
-        "operator",
-        "current_goal",
     ),
 }
 

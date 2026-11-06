@@ -28,8 +28,6 @@ jobs:
         run: ruff format --check .
       - name: Unit tests
         run: pytest -q
-      - name: Repo consistency checks
-        run: python scripts/check.py
 
   no-pypi-fallback:
     runs-on: ubuntu-latest
@@ -43,7 +41,7 @@ jobs:
         # these names ever appears on the index, fail here — without downloading
         # or building anything a squatter uploaded.
         run: |
-          for name in commerce-common shopping-agent-core shopping-agent-runtime shopping-agent-sdk merchant-agent-core merchant-agent-runtime merchant-agent-sdk; do
+          for name in commerce-common shopping-agent-core shopping-agent-runtime; do
             if pip index versions "$name" > idx.log 2>&1; then
               echo "ALERT: $name is registered on the public index"; cat idx.log; exit 1
             fi
@@ -57,7 +55,7 @@ jobs:
         # unregistered, and --only-binary forbids building any remote sdist
         # even in the window between the two steps (local dirs still build).
         run: |
-          for pkg in ./shopping-agent/core ./shopping-agent/runtime-messages-api ./shopping-agent/runtime-agent-sdk ./merchant-agent/core ./merchant-agent/runtime-messages-api ./merchant-agent/runtime-agent-sdk; do
+          for pkg in ./shopping-agent/core ./shopping-agent/runtime-messages-api; do
             if pip install --dry-run --only-binary=:all: "$pkg" > out.log 2>&1; then
               echo "UNEXPECTED: $pkg resolved without sibling installs"; cat out.log; exit 1
             fi
@@ -65,7 +63,7 @@ jobs:
           done
 
   web:
-    # The eight example apps are one npm workspace (examples/); install once, build each.
+    # The storefront and the shared web code are one npm workspace (examples/).
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -79,5 +77,5 @@ jobs:
           cache-dependency-path: examples/package-lock.json
       - name: Install
         run: npm ci
-      - name: Build every app
+      - name: Build the storefront
         run: npm run build

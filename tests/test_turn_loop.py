@@ -28,7 +28,6 @@ from commerce_common.testing import (
 )
 from commerce_common.turn import CLEARED_RESULT, UNREADABLE_INPUT_TEXT, session_tag
 from commerce_common.types import ClockContext
-from merchant_agent_runtime import MerchantAgent
 from shopping_agent_runtime import ShoppingAgent
 
 
@@ -67,29 +66,6 @@ ROLES = {
         ("present_products", {"picks": [{"product_id": "p-100"}]}),
         ("present_products", {"picks": [{"product_id": "p-100"}, {"product_id": "p-999"}]}),
         frozenset({"present_products", "present_comparison", "present_plan", "present_guide"}),
-    ),
-    "merchant": Loop(
-        MerchantAgent,
-        # The metrics terms force the snapshot and the change-shaped tail earns a third, reminded call.
-        (
-            (
-                "What's the conversion trend — should we drop the tote price by 10%?",
-                "get_business_snapshot",
-                {},
-                3,
-            ),
-        ),
-        "Anything urgent this morning?",
-        (
-            "stage_inventory_action",
-            {"items": [{"listing_id": "L-202", "action": "restock", "quantity": 4}]},
-        ),
-        "# Merchant context",
-        ("get_inventory_alerts", {}, "get_inventory_alerts"),
-        (("get_inventory_alerts", {}), ("get_business_snapshot", {})),
-        ("present_digest", {"items": [{"kind": "note", "headline": "Two alerts open."}]}),
-        ("present_metrics", {"picks": [{"metric": "sales"}, {"metric": "footfall"}]}),
-        frozenset({"present_metrics", "present_digest", "present_change_preview"}),
     ),
 }
 

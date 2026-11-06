@@ -1,7 +1,7 @@
 # Copyright 2026 Anthropic PBC
 # SPDX-License-Identifier: Apache-2.0
 
-"""The mechanisms both agent roles build on. Import from the submodules:
+"""The mechanisms the shopping agent builds on. Import from the submodules:
 
 ``config``            ``BaseAgentConfig`` and the model defaults
 ``types``             ``MemoryFact``, ``MemoryCategory``, ``ClockContext``
@@ -15,8 +15,5 @@
 ``execution``         ``BaseToolExecutor``, the frame each role's executor extends
 ``streaming``         ``AgentEvent``, ``ToolOutcome``, ``to_sse``
 ``turn``              helpers for the Messages API turn loop
-``agent_sdk``         plumbing for the Agent SDK runtimes (needs ``claude-agent-sdk``)
-``mcp_server``        plumbing for the reference MCP servers (needs ``mcp``)
-``manifest``          resolves a Managed Agent manifest; ``scripts/deploy_managed_agent.sh`` runs it
 ``testing``           a scripted fake model client
 """

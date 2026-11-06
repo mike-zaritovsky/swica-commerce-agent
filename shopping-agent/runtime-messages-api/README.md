@@ -24,7 +24,7 @@ agent = ShoppingAgent(
     skills_dir=Path("shopping-agent/skills"),
     config=ShoppingAgentConfig(brand_name="Your Store"),
     memory_store=your_store,                    # optional; a commerce_common.memory.MemoryStore
-    client=your_client,                         # optional; see docs/deployment.md
+    client=your_client,                         # optional; any anthropic.AsyncAnthropic
 )
 
 state = ShoppingSessionState()                # keep per session: provenance and cart state
@@ -60,7 +60,7 @@ stream error propagates out of `stream_turn`; the host catches it and emits an `
   reads and deletes through `agent.memory.store`.
 
 The gates themselves (fencing, provenance, caps, memory validation) are in
-`shopping_agent` and `commerce_common`; [`docs/safety.md`](../../docs/safety.md) lists them.
+`shopping_agent` and `commerce_common`.
 
 Credentials: the default client reads `ANTHROPIC_API_KEY` (or a token and base URL) from
 the environment. Tests run without any: `pytest shopping-agent/runtime-messages-api/tests`

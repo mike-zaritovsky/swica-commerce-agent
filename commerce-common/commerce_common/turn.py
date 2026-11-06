@@ -462,8 +462,8 @@ def log_model_call(
     """The record every model call writes, on the caller's logger and attributed to the
     calling line: at INFO the session's tag and the ids the caller passes, the model, the
     stop reason, the usage, and the time taken; at DEBUG the request as sent and the
-    response as received. ``docs/safety.md`` says what the bodies contain and so what a
-    DEBUG log holds."""
+    response as received. The bodies can contain customer data, so a DEBUG log holds
+    customer data."""
     tags = " ".join(
         f"{key}={value}" for key, value in {"session": session_tag(session_id), **ids}.items()
     )

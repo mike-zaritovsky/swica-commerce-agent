@@ -4,7 +4,7 @@
 """The StorefrontBackend interface: the one integration surface an adopter implements,
 mapping each method onto their catalog, cart, profile, order, and policy services.
 Everything these methods return reaches the model as fenced data (fencing.py).
-``examples/retail/api/mock_retail.py`` is a complete in-memory implementation.
+``examples/shopify_demo/api/shopify_backend.py`` implements it over the Shopify Storefront API.
 """
 
 from __future__ import annotations
@@ -78,7 +78,7 @@ class StorefrontBackend(ABC):
     ) -> ProductDetails | None:
         """The full record for one id as the model wrote it, or None when the id is
         unknown. A family's ``variants`` carries its purchasable records inside one fenced
-        result (``docs/backends.md`` gives the size limit; each variant may override any
+        result (keep it small; each variant may override any
         field it inherits), and the record and its variants are what enter the session's
         provenance. A variant's id returns that variant."""
 

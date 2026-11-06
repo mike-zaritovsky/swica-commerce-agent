@@ -3,7 +3,7 @@
 
 /**
  * Every app imports `base.css`; a storefront defines `.chip`, `.user-bubble`, and `.btn-primary`
- * in its globals.css, a merchant portal imports `portal/portal.css`.
+ * in its globals.css.
  */
 
 export { AgentApi } from "./api";
@@ -14,12 +14,6 @@ export { detectLanguage, getLocale, type Locale, localeTag, registerTranslations
 export { type GenerativeBlockProps, UnknownBlock } from "./generative";
 export { Icon, type IconName } from "./icons";
 export { Inspector } from "./Inspector";
-export { AssistantPanel } from "./portal/AssistantPanel";
-export { AssistantRail } from "./portal/AssistantRail";
-export * from "./portal/cards";
-export * from "./portal/home";
-export { type ChangeAction, type MerchantChat, useMerchantChat } from "./portal/merchant";
-export { type PortalNavItem, PortalShell } from "./portal/Shell";
 export type * from "./protocol";
 export { QuotedAsData } from "./QuotedAsData";
 export { useResource } from "./resource";

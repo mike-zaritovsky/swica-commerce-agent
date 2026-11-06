@@ -9,9 +9,6 @@ import json
 
 import pytest
 
-from merchant_agent import Listing
-from merchant_agent import serialization as merchant_serialization
-from merchant_agent.fencing import MERCHANT_FENCE
 from shopping_agent import Product
 from shopping_agent import serialization as shopping_serialization
 from shopping_agent.fencing import STOREFRONT_FENCE
@@ -21,13 +18,6 @@ ROLES = {
         shopping_serialization,
         STOREFRONT_FENCE,
         lambda i: Product(product_id=f"P-{i}", title=f"Fixture Product {i}", price=10.0 + i),
-    ),
-    "merchant": (
-        merchant_serialization,
-        MERCHANT_FENCE,
-        lambda i: Listing(
-            listing_id=f"L-{i}", title=f"Fixture Listing {i}", price=10.0 + i, stock=5
-        ),
     ),
 }
 
