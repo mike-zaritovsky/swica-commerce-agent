@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "commerce-common"
 version = "0.1.0.dev0"
-description = "What both commerce agent roles build on: config, fencing, memory, skills, grounding, presentation, the executor frame, and the event protocol."
+description = "What the shopping agent builds on: config, fencing, memory, skills, grounding, presentation, the executor frame, and the event protocol."
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 classifiers = ["License :: OSI Approved :: Apache Software License"]

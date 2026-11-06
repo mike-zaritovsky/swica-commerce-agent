@@ -25,7 +25,7 @@ function asProduct(item: CartItem, catalog: Record<string, Product>): Product {
   );
 }
 
-/** "the ACME Sleep Hybrid Mattress (queen)": what a message to the assistant calls a line. */
+/** "Favorit Telmed": what a message to the assistant calls a line (with its options, if any). */
 function lineName(item: CartItem): string {
   const chosen = optionValuesLabel(item);
   return chosen ? `${item.title} (${chosen})` : item.title;
