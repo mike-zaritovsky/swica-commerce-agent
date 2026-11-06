@@ -26,7 +26,7 @@
 
   var AGENT_URL = 'http://localhost:3000/'; // the storefront; a deployed https URL for a shared demo
   var MENU_ITEM = true;
-  var BUBBLE = true;
+  var BUBBLE = false; // the site's own menu carries the entry; true adds a floating button too
 
   // Colours from swica.ch's design tokens.
   var MINT = '#33e6be'; // help button
@@ -36,6 +36,7 @@
   var lang = (document.documentElement.lang || location.pathname.split('/')[1] || 'de').slice(0, 2).toLowerCase();
   var de = lang !== 'en';
   var LABEL = de ? 'KI-Assistent' : 'AI Assistant';
+  var EYEBROW = de ? 'Versicherung finden' : 'Find your cover';
   var OPEN_LABEL = de ? 'SWICA KI-Assistent öffnen' : 'Open the SWICA AI assistant';
   var CLOSE_LABEL = de ? 'Schliessen' : 'Close';
 
@@ -163,11 +164,15 @@
       var icon = item.querySelector('[class*="info-panel_icon"]');
       if (!link || !label) return;
       label.textContent = LABEL + ' ✦';
+      // The cloned entry's caption names the site's own chat; give ours its own.
+      var caption = label.parentNode && Array.prototype.find.call(label.parentNode.children, function (el) { return el !== label; });
+      if (caption) caption.textContent = EYEBROW;
       if (icon) icon.innerHTML = SPARK;
       // A cloned <a> would navigate; replace it with a button that keeps its classes.
       var trigger = document.createElement('button');
       trigger.type = 'button';
       trigger.className = link.className;
+      trigger.style.textAlign = 'left'; // buttons centre their text by default
       trigger.innerHTML = link.innerHTML;
       trigger.addEventListener('click', function (e) {
         e.preventDefault();

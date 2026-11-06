@@ -53,17 +53,24 @@ runtime logger; from the second turn the cached figure should be above zero.
 
 ## Embed on swica.ch
 
-`embed/swica-embed.js` adds the assistant to www.swica.ch: an entry in the site's "How can we
-help you?" menu and a floating button in the site's style, both opening the storefront
-(`AGENT_URL`, default `http://localhost:3000/`) in the page's language. Run it on swica.ch in
-the DevTools console, or install it as a Tampermonkey userscript so it runs on every page load
-(the header at its top sets the match).
+`embed/swica-embed.js` adds an "AI Assistant" / "KI-Assistent" entry to the "How can we help
+you?" menu of www.swica.ch, cloned from the site's own entries so it keeps their style; it
+opens the storefront (`AGENT_URL`, default `http://localhost:3000/`) in a side panel, in the
+page's language. `BUBBLE = true` adds a floating button as well.
 
-swica.ch's Content-Security-Policy lists the sites it allows in iframes, and `AGENT_URL` is not
-on it, so the script opens the assistant in a popup window docked to the right. The side panel
-opens instead when the CSP is lifted: in production by adding `AGENT_URL`'s origin to the
-site's `frame-src`, for a local demo by a browser extension that disables the CSP.
-`AGENT_URL` on localhost reaches only the machine the storefront runs on.
+swica.ch sends a Content-Security-Policy header whose `frame-src` lists the sites it allows in
+iframes; a script on the page (the console, a userscript, or a tag manager) cannot relax it.
+Where the iframe is blocked, the embed opens the assistant in a popup window instead. For a
+demo on the live site, `scripts/swica_demo.py` opens swica.ch in a browser window that runs the
+embed on every page and ignores the CSP, so the side panel works; the site is unchanged:
+
+```bash
+pip install playwright && playwright install chromium     # once
+python scripts/swica_demo.py                               # --lang en for the English site
+```
+
+In production the panel needs `AGENT_URL` on a public https origin that SWICA adds to its
+`frame-src`. On localhost the assistant reaches only the machine the storefront runs on.
 
 ## Behaviour
 
