@@ -73,11 +73,11 @@ export class AgentApi {
   }
 
   /** A storefront passes its profile as `{ user_id }` and gets the shopper's name back; a merchant session names its operator. */
-  async startSession(body?: Record<string, unknown>): Promise<{ sessionId: string; operator?: string; shopper?: { name: string; tier?: string } } | null> {
-    const data = await this.post<{ session_id: string; operator?: string; name?: string | null; tier?: string | null }>("/session", body);
+  async startSession(body?: Record<string, unknown>): Promise<{ sessionId: string; userId?: string; operator?: string; shopper?: { name: string; tier?: string } } | null> {
+    const data = await this.post<{ session_id: string; user_id?: string; operator?: string; name?: string | null; tier?: string | null }>("/session", body);
     if (!data?.session_id) return null;
     const shopper = data.name ? { name: data.name, tier: data.tier ?? undefined } : undefined;
-    return { sessionId: data.session_id, operator: data.operator, shopper };
+    return { sessionId: data.session_id, userId: data.user_id, operator: data.operator, shopper };
   }
 
   async fetchMemory(): Promise<MemoryFact[] | null> {

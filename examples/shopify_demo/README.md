@@ -84,6 +84,11 @@ In production the panel needs `AGENT_URL` on a public https origin that SWICA ad
   cart, so a new KVG model replaces the previous one. Checkout hands off to the Shopify
   checkout as the application; prices stay "from" premiums throughout.
 
+- Visitors and memory: visitors are anonymous. The API issues each browser a random id
+  (`anon-…`), which the browser keeps and sends back on later visits; memory is keyed by it,
+  so it follows one visitor and is never shared. A start request can only resume an issued
+  id, never claim another. Memory lives in the API process and clears on restart.
+
 ## Where things are
 
 - `DEMO.md`: a demo conversation and what each answer shows.

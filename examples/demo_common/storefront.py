@@ -21,6 +21,8 @@ dependency, and mounts a direct add-to-cart button through ``StorefrontHost.dire
 # Route parameters below are annotated with dependencies built at call time, so this
 # module evaluates its annotations eagerly (no ``from __future__ import annotations``).
 
+import re
+import secrets
 from collections.abc import Awaitable, Callable, Sequence
 from datetime import datetime
 from pathlib import Path
@@ -52,8 +54,21 @@ _HELD_ADD_TEXT = {
 
 
 class StartSessionRequest(BaseModel):
-    # The demo's stand-in for a credential: a profile from data/users.json.
-    user_id: str = Field(default="demo-user", min_length=1, max_length=64)
+    # The anonymous id this server issued to the browser on an earlier visit, if any.
+    user_id: str | None = Field(default=None, max_length=64)
+
+
+# Visitors are anonymous: the server issues each browser its own random id, and a start
+# request may only resume an id of that form, never name another one (such as a seeded
+# profile). Memory is keyed by this id, so visitors never share it.
+_ANONYMOUS_ID = re.compile(r"anon-[A-Za-z0-9_-]{24}")
+
+
+def anonymous_user_id(claimed: str | None) -> str:
+    """``claimed`` when it is an id this server issues, else a fresh one."""
+    if claimed and _ANONYMOUS_ID.fullmatch(claimed):
+        return claimed
+    return "anon-" + secrets.token_urlsafe(18)
 
 
 class ChatRequest(BaseModel):
@@ -191,7 +206,7 @@ def build_storefront_host(
 
     @app.post("/api/session")
     async def start_session(request: StartSessionRequest | None = None) -> dict:
-        record = host.sessions.start((request or StartSessionRequest()).user_id)
+        record = host.sessions.start(anonymous_user_id((request or StartSessionRequest()).user_id))
         profile = await backend.get_preferences(host.context(record))
         return {
             "session_id": record.session_id,
