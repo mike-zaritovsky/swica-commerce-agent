@@ -29,6 +29,12 @@ cd examples/shopify_demo/storefront-web && npx next dev -p 3000
 the swica.ch embed and demo launcher, and where each part lives;
 [`examples/shopify_demo/DEMO.md`](examples/shopify_demo/DEMO.md) is a demo conversation.
 
+## Deploy
+
+`docker compose up -d --build` runs the API, the storefront, and a proxy that serves both on
+one origin; [`deploy/README.md`](deploy/README.md) lists the variables and what to put in
+front of it.
+
 ## Layout
 
 | Directory | Contents | pip package, `import` name |
@@ -38,6 +44,7 @@ the swica.ch embed and demo launcher, and where each part lives;
 | [`shopping-agent/runtime-messages-api/`](shopping-agent/runtime-messages-api/) | `ShoppingAgent`, the turn loop on the Messages API | `shopping-agent-runtime`, `shopping_agent_runtime` |
 | [`shopping-agent/skills/`](shopping-agent/skills/) | The agent's five flows, one `SKILL.md` each | — |
 | [`examples/`](examples/) | The SWICA demo (`shopify_demo/`), its host code (`demo_common/`), shared web code (`web-shared/`) | — |
+| [`deploy/`](deploy/) | Dockerfiles for the API and the storefront, the proxy config, the deploy guide (`docker-compose.yml` is at the root) | — |
 | [`scripts/`](scripts/) | `gateway_smoke.py` (checks the gateway keys), `swica_demo.py` (swica.ch with the assistant), `install.sh` | — |
 | [`tests/`](tests/) | Suites that span packages; each package also has its own `tests/` | — |
 

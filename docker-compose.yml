@@ -1,0 +1,45 @@
+# The SWICA demo: API, storefront, and a proxy that serves both on one origin.
+#   docker compose up -d --build        # then open http://<host>:8080
+# Variables come from the environment or a .env file next to this file
+# (.env.example lists them). Put TLS and access control in front of the proxy.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: deploy/api.Dockerfile
+    restart: unless-stopped
+    environment:
+      SHOPIFY_STORE_DOMAIN: ${SHOPIFY_STORE_DOMAIN:?set SHOPIFY_STORE_DOMAIN}
+      SHOPIFY_STOREFRONT_TOKEN: ${SHOPIFY_STOREFRONT_TOKEN:?set SHOPIFY_STOREFRONT_TOKEN}
+      FOUNDRY_SUBSCRIPTION_KEY: ${FOUNDRY_SUBSCRIPTION_KEY:?set FOUNDRY_SUBSCRIPTION_KEY}
+      FOUNDRY_PROJECT: ${FOUNDRY_PROJECT:?set FOUNDRY_PROJECT}
+      FOUNDRY_SUBSCRIPTION_KEY_FALLBACK: ${FOUNDRY_SUBSCRIPTION_KEY_FALLBACK:-}
+      FOUNDRY_PROJECT_FALLBACK: ${FOUNDRY_PROJECT_FALLBACK:-}
+      # Optional; defaults are in examples/demo_common/gateway.py and agent_profile.py.
+      FOUNDRY_GATEWAY_URL: ${FOUNDRY_GATEWAY_URL:-https://ai-api-dev.dentsu.com/foundry}
+      AGENT_MODEL: ${AGENT_MODEL:-claude-sonnet-5}
+      AGENT_MEMORY_MODEL: ${AGENT_MEMORY_MODEL:-claude-haiku-4-5}
+    # One instance only: sessions and memory live in the process.
+    deploy:
+      replicas: 1
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ""
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  proxy:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "${PROXY_PORT:-8080}:80"
+    depends_on:
+      - api
+      - web
