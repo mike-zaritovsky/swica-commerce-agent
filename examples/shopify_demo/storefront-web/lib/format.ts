@@ -1,8 +1,6 @@
 // Copyright 2026 Anthropic PBC
 // SPDX-License-Identifier: Apache-2.0
 
-import { tr } from "web-shared";
-
 /** Image-less products get a tile color and glyph from id and category. */
 
 // SWICA tile grounds: gruen-200/-300, neutrals-200, blau-200 (from swica.ch's palette).
@@ -90,7 +88,5 @@ export function attributeChips(product: { attributes?: Record<string, string> })
     .filter((chip): chip is string => Boolean(chip))
     // A value can arrive twice (a Shopify product type repeated as a tag); show it once.
     .filter((chip, index, chips) => chips.findIndex((other) => other.toLowerCase() === chip.toLowerCase()) === index)
-    .slice(0, 3)
-    // Labels come from the store's tags in English; the interface language translates them.
-    .map((chip) => tr(chip));
+    .slice(0, 3);
 }
