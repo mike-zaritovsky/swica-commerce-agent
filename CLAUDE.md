@@ -9,11 +9,11 @@ API over a Shopify store, with its storefront and swica.ch embed.
 - `shopping-agent/core/shopping_agent/`: types, `StorefrontBackend`, config, prompt, `tools/`, gates, enrichment, executor.
 - `shopping-agent/runtime-messages-api/`: `ShoppingAgent`, the turn loop.
 - `shopping-agent/skills/`: five flows, one `SKILL.md` each.
-- `examples/shopify_demo/`: the SWICA demo: `api/` (Shopify backend, agent profile, wiring), `data/` (terms, memory seed), `storefront-web/` (Next.js), `embed/` (swica.ch script); its README says how to run it, `DEMO.md` is a demo conversation.
+- `examples/shopify_demo/`: the SWICA demo: `api/` (Shopify backend, agent profile, wiring), `data/` (terms, memory seed), `storefront-web/` (Next.js), `embed/` (swica.ch script), `chrome-extension/` (runs the embed on swica.ch; `scripts/build_extension.py` builds it); its README says how to run it, `DEMO.md` is a demo conversation.
 - `examples/demo_common/`: host code the API uses; `gateway.py` is the `AsyncAnthropic` client for the dentsu AI gateway, with key fallback.
 - `examples/web-shared/`: the storefront's shared web code; `i18n.ts` is the interface language (`tr`, `setLocale`, `detectLanguage`).
 - `deploy/` and `docker-compose.yml`: the containers (API, storefront, nginx proxy on one origin); `deploy/README.md` lists the variables.
-- `scripts/`: `gateway_smoke.py`, `swica_demo.py`, `install.sh`.
+- `scripts/`: `gateway_smoke.py`, `swica_demo.py`, `build_extension.py`, `install.sh`.
 - `tests/`: suites that span packages; each package keeps its own `tests/`.
 
 `requirements.txt` installs the three packages and their pinned dependencies

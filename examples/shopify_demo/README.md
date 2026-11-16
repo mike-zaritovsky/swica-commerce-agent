@@ -71,6 +71,22 @@ python scripts/swica_demo.py                               # --lang en for the E
 In production the panel needs `AGENT_URL` on a public https origin that SWICA adds to its
 `frame-src`. On localhost the assistant reaches only the machine the storefront runs on.
 
+## Chrome extension
+
+`chrome-extension/` is the extension the team installs to see the assistant on the live
+swica.ch: it runs `embed/swica-embed.js` on www.swica.ch and removes the site's
+Content-Security-Policy header there (a `declarativeNetRequest` rule), so the side panel
+loads. Build it with the deployed URL, then hand out the zip with the guide inside it
+(`chrome-extension/README.md`):
+
+```bash
+python scripts/build_extension.py --agent-url https://<deployed-host>/
+# -> dist/swica-assistant-extension/ and dist/swica-assistant-extension-<version>.zip
+```
+
+Raise `version` in `chrome-extension/manifest.json` for each release. The deployed site must
+allow being framed (no `X-Frame-Options: DENY` or restrictive `frame-ancestors`).
+
 ## Behaviour
 
 - Languages: English and German (Swiss Standard German). The EN | DE switch in the app bar

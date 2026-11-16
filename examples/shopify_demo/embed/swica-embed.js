@@ -19,12 +19,16 @@
  * to the right instead. The side panel works once AGENT_URL's origin is on that list, or
  * in a browser with an extension that disables the CSP for the demo.
  *
- * Run it in the DevTools console on swica.ch, or let a userscript extension run it on load.
+ * Run it in the DevTools console on swica.ch, let a userscript extension run it on load, or
+ * install the Chrome extension (examples/shopify_demo/chrome-extension), which runs it on
+ * every swica.ch page and lifts the CSP there.
  */
 (function () {
   if (document.getElementById('swica-ai-panel')) return;
 
   var AGENT_URL = 'http://localhost:3000/'; // the storefront; a deployed https URL for a shared demo
+  // The Chrome extension sets SWICA_AI_CONFIG (its config.js) to the deployed URL.
+  if (typeof SWICA_AI_CONFIG !== 'undefined' && SWICA_AI_CONFIG.agentUrl) AGENT_URL = SWICA_AI_CONFIG.agentUrl;
   var MENU_ITEM = true;
   var BUBBLE = false; // the site's own menu carries the entry; true adds a floating button too
 
